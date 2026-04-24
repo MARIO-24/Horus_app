@@ -1,9 +1,6 @@
-import 'dart:math';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:horus_app/core/constants/app_constants.dart';
 import 'package:horus_app/presentation/providers/chatbot_provider.dart';
 import 'package:horus_app/presentation/providers/routine_provider.dart';
 import 'package:horus_app/presentation/providers/user_provider.dart';
@@ -24,16 +21,9 @@ class _SplashScreenState extends State<SplashScreen>
   late Animation<double> _fadeAnim;
   late Animation<double> _scaleAnim;
 
-  late final String _phrase;
-
   @override
   void initState() {
     super.initState();
-
-    // Seleccionar frase aleatoria al iniciar
-    final random = Random();
-    _phrase = AppConstants.motivationalPhrases[
-        random.nextInt(AppConstants.motivationalPhrases.length)];
 
     // Configurar animaciones de entrada
     _controller = AnimationController(
@@ -97,69 +87,13 @@ class _SplashScreenState extends State<SplashScreen>
           child: Center(
             child: FadeTransition(
               opacity: _fadeAnim,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // ── Logo ──────────────────────────────────────────────
-                  ScaleTransition(
-                    scale: _scaleAnim,
-                    child: Image.asset(
-                      'iconos/Logo_HorusApp.png',
-                      width: 160,
-                      height: 160,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // ── Nombre de la app ──────────────────────────────────
-                  const Text(
-                    AppConstants.appName,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 42,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 3,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    AppConstants.appTagline,
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.8),
-                      fontSize: 14,
-                      letterSpacing: 1,
-                    ),
-                  ),
-
-                  const SizedBox(height: 48),
-
-                  // ── Frase motivadora ──────────────────────────────────
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
-                    child: Text(
-                      '"$_phrase"',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.9),
-                        fontSize: 16,
-                        fontStyle: FontStyle.italic,
-                        height: 1.5,
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 64),
-
-                  // ── Indicador de carga ───────────────────────────────
-                  SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 3,
-                      color: Colors.white.withValues(alpha: 0.7),
-                    ),
-                  ),
-                ],
+              child: ScaleTransition(
+                scale: _scaleAnim,
+                child: Image.asset(
+                  'iconos/Logo_HorusApp.png',
+                  width: 200,
+                  height: 200,
+                ),
               ),
             ),
           ),

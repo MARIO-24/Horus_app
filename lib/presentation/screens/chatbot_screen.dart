@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:horus_app/core/l10n/app_l10n.dart';
 import 'package:horus_app/presentation/providers/chatbot_provider.dart';
 import 'package:horus_app/presentation/widgets/chat_bubble.dart';
 import 'package:horus_app/presentation/widgets/custom_drawer.dart';
@@ -49,20 +50,18 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   Widget build(BuildContext context) {
     final chatbot = context.watch<ChatbotProvider>();
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppL10n.of(context);
 
     return Scaffold(
       appBar: AppBar(
         title: Row(
           children: [
-            CircleAvatar(
-              radius: 18,
-              backgroundColor: colorScheme.primary,
-              child: const Text(
-                'H',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+            ClipOval(
+              child: Image.asset(
+                'iconos/Icono_ChatBot.png',
+                width: 36,
+                height: 36,
+                fit: BoxFit.cover,
               ),
             ),
             const SizedBox(width: 10),
@@ -71,7 +70,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
               children: [
                 const Text('Horus Bot', style: TextStyle(fontSize: 16)),
                 Text(
-                  chatbot.isTyping ? 'Escribiendo...' : 'Entrenador virtual',
+                  chatbot.isTyping ? l10n.typing : l10n.virtualTrainer,
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.white.withValues(alpha: 0.8),

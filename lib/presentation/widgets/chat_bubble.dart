@@ -35,6 +35,10 @@ class ChatBubble extends StatelessWidget {
                 'iconos/Icono_ChatBot.png',
                 width: 32,
                 height: 32,
+              ),
+            ),
+            const SizedBox(width: 8),
+          ],
 
           // Burbuja del mensaje
           Flexible(

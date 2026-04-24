@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:horus_app/core/l10n/app_l10n.dart';
 import 'package:horus_app/presentation/providers/auth_provider.dart';
 import 'package:horus_app/presentation/providers/chatbot_provider.dart';
 import 'package:horus_app/presentation/providers/routine_provider.dart';
@@ -268,6 +269,7 @@ class _AccountScreenState extends State<AccountScreen> {
     final isUploading = userProvider.isUploadingAvatar;
     final routineProvider = context.watch<RoutineProvider>();
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppL10n.of(context);
 
     final displayName = (user?.name.isNotEmpty == true)
         ? user!.name
@@ -282,7 +284,7 @@ class _AccountScreenState extends State<AccountScreen> {
           children: [
             Image.asset('iconos/Icono_Cuenta.png', width: 28, height: 28),
             const SizedBox(width: 10),
-            const Text('Mi Cuenta'),
+            Text(l10n.account),
           ],
         ),
       ),

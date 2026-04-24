@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:horus_app/core/l10n/app_l10n.dart';
 import 'package:horus_app/domain/entities/routine_entity.dart';
 import 'package:horus_app/presentation/providers/routine_provider.dart';
 import 'package:horus_app/presentation/widgets/custom_drawer.dart';
@@ -15,6 +16,7 @@ class RoutineScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final routineProvider = context.watch<RoutineProvider>();
+    final l10n = AppL10n.of(context);
 
     if (routineProvider.isLoading) {
       return const Scaffold(
@@ -24,7 +26,16 @@ class RoutineScreen extends StatelessWidget {
 
     if (!routineProvider.hasRoutine) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Mi Rutina')),
+        appBar: AppBar(
+          title: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset('iconos/Icono_Rutina.png', width: 28, height: 28),
+              const SizedBox(width: 10),
+              Text(l10n.routine),
+            ],
+          ),
+        ),
         drawer: const CustomDrawer(),
         body: Center(
           child: Column(
@@ -53,7 +64,7 @@ class RoutineScreen extends StatelessWidget {
           children: [
             Image.asset('iconos/Icono_Rutina.png', width: 28, height: 28),
             const SizedBox(width: 10),
-            const Text('Mi Rutina'),
+            Text(l10n.routine),
           ],
         ),
         actions: [

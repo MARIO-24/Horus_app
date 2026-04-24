@@ -8,8 +8,8 @@ class AppTheme {
   // ── Colores principales ───────────────────────────────────────────────────
   static const Color _primarySeed = Color(0xFFC9A84C); // Dorado Horus
   static const Color _darkNavy   = Color(0xFF1A1A2E);  // Azul noche oscuro
-  static const Color _lightBg    = Color(0xFFFAF7F0);  // Crema cálido
-  static const Color _lightCard  = Color(0xFFFFFFFF);
+  static const Color _lightBg    = Color(0xFFE8DCC0);  // Dorado claro
+  static const Color _lightCard  = Color(0xFFF5EDD6);  // Crema dorada
 
   // ── Tema claro ────────────────────────────────────────────────────────────
   static ThemeData get lightTheme => ThemeData(
@@ -59,7 +59,7 @@ class AppTheme {
             borderSide: const BorderSide(color: Color(0xFFC9A84C), width: 2),
           ),
           filled: true,
-          fillColor: const Color(0xFFFFF9EE),
+          fillColor: const Color(0xFFEEE4C8),
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
@@ -93,7 +93,7 @@ class AppTheme {
           ),
         ),
         drawerTheme: const DrawerThemeData(
-          backgroundColor: Color(0xFFFAF7F0),
+          backgroundColor: Color(0xFFE8DCC0),
         ),
       );
 

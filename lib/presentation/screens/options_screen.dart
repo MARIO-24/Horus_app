@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
 import 'package:flutter/material.dart';
+import 'package:horus_app/core/l10n/app_l10n.dart';
 import 'package:horus_app/presentation/providers/auth_provider.dart';
 import 'package:horus_app/presentation/providers/chatbot_provider.dart';
 import 'package:horus_app/presentation/providers/locale_provider.dart';
@@ -8,6 +9,7 @@ import 'package:horus_app/presentation/providers/theme_provider.dart';
 import 'package:horus_app/presentation/providers/user_provider.dart';
 import 'package:horus_app/presentation/widgets/custom_drawer.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Pantalla de opciones/configuración
 class OptionsScreen extends StatelessWidget {
@@ -17,19 +19,29 @@ class OptionsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
     final localeProvider = context.watch<LocaleProvider>();
+    final l10n = AppL10n.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Opciones')),
+      appBar: AppBar(
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset('iconos/Icono_Opciones.png', width: 28, height: 28),
+            const SizedBox(width: 10),
+            Text(l10n.settings),
+          ],
+        ),
+      ),
       drawer: const CustomDrawer(),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           // ── Apariencia ─────────────────────────────────────────────────
-          _SectionHeader(title: 'Apariencia', icon: Icons.palette_outlined),
+          _SectionHeader(title: l10n.appearance, icon: Icons.palette_outlined),
           Card(
             child: Column(
               children: ThemeMode.values.map((mode) {
-                final label = _themeModeLabel(mode);
+                final label = _themeModeLabel(mode, l10n);
                 final icon = _themeModeIcon(mode);
                 final isSelected = themeProvider.themeMode == mode;
 
@@ -50,14 +62,14 @@ class OptionsScreen extends StatelessWidget {
           const SizedBox(height: 24),
 
           // ── Idioma ──────────────────────────────────────────────────
-          _SectionHeader(title: 'Idioma', icon: Icons.language),
+          _SectionHeader(title: l10n.language, icon: Icons.language),
           Card(
             child: Column(
               children: [
                 RadioListTile<Locale>(
                   value: const Locale('es', 'ES'),
                   groupValue: localeProvider.locale,
-                  title: const Text('Español'),
+                  title: Text(l10n.spanish),
                   secondary: const Text('🇪🇸', style: TextStyle(fontSize: 20)),
                   onChanged: (v) {
                     if (v != null) localeProvider.setLocale(v);
@@ -68,7 +80,7 @@ class OptionsScreen extends StatelessWidget {
                 RadioListTile<Locale>(
                   value: const Locale('en', 'US'),
                   groupValue: localeProvider.locale,
-                  title: const Text('English'),
+                  title: Text(l10n.english),
                   secondary: const Text('🇺🇸', style: TextStyle(fontSize: 20)),
                   onChanged: (v) {
                     if (v != null) localeProvider.setLocale(v);
@@ -82,16 +94,15 @@ class OptionsScreen extends StatelessWidget {
           const SizedBox(height: 24),
 
           // ── Rutina ─────────────────────────────────────────────────────
-          _SectionHeader(title: 'Rutina', icon: Icons.fitness_center),
+          _SectionHeader(title: l10n.routineSection, icon: Icons.fitness_center),
           Card(
             child: Column(
               children: [
                 ListTile(
                   leading: const Icon(Icons.delete_outline,
                       color: Colors.orange),
-                  title: const Text('Eliminar rutina actual'),
-                  subtitle: const Text(
-                      'Podrás generar una nueva rutina cuando quieras'),
+                  title: Text(l10n.deleteRoutine),
+                  subtitle: Text(l10n.deleteRoutineSubtitle),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () =>
                       _showDeleteRoutineDialog(context),
@@ -102,13 +113,13 @@ class OptionsScreen extends StatelessWidget {
           const SizedBox(height: 24),
 
           // ── Cuenta ─────────────────────────────────────────────────────
-          _SectionHeader(title: 'Cuenta', icon: Icons.person_outline),
+          _SectionHeader(title: l10n.accountSection, icon: Icons.person_outline),
           Card(
             child: Column(
               children: [
                 ListTile(
                   leading: const Icon(Icons.logout, color: Colors.blue),
-                  title: const Text('Cerrar sesión'),
+                  title: Text(l10n.logout),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => _showLogoutDialog(context),
                 ),
@@ -116,13 +127,13 @@ class OptionsScreen extends StatelessWidget {
                 ListTile(
                   leading: const Icon(Icons.delete_forever,
                       color: Colors.red),
-                  title: const Text(
-                    'Eliminar cuenta',
-                    style: TextStyle(color: Colors.red),
+                  title: Text(
+                    l10n.deleteAccount,
+                    style: const TextStyle(color: Colors.red),
                   ),
-                  subtitle: const Text(
-                    'Esta acción es permanente e irreversible',
-                    style: TextStyle(fontSize: 12),
+                  subtitle: Text(
+                    l10n.deleteAccountSubtitle,
+                    style: const TextStyle(fontSize: 12),
                   ),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () =>
@@ -134,26 +145,30 @@ class OptionsScreen extends StatelessWidget {
           const SizedBox(height: 24),
 
           // ── Acerca de ─────────────────────────────────────────────────
-          _SectionHeader(title: 'Acerca de', icon: Icons.info_outline),
+          _SectionHeader(title: l10n.about, icon: Icons.info_outline),
           Card(
             child: Column(
               children: [
-                _InfoTile(title: 'Aplicación', value: 'HorusAPP v1.0.0'),
+                _InfoTile(title: l10n.appNameLabel, value: 'HorusAPP v1.0.0'),
                 const Divider(height: 1, indent: 16),
-                _InfoTile(title: 'Desarrollador', value: 'Mario'),
+                _InfoTile(title: l10n.developer, value: 'Rufito'),
                 const Divider(height: 1, indent: 16),
-                _InfoTile(title: 'Proyecto', value: 'TFG — Grado en Ingeniería Informática'),
+                _InfoTile(title: l10n.project, value: 'TFG — Grado en Ingeniería Informática'),
                 const Divider(height: 1, indent: 16),
-                _InfoTile(title: 'Tecnologías', value: 'Flutter · Firebase · Gemini AI'),
+                _InfoTile(title: l10n.technologies, value: 'Flutter · Firebase · Gemini AI'),
                 const Divider(height: 1, indent: 16),
-                _InfoTile(title: 'Arquitectura', value: 'Clean Architecture · Provider'),
+                _InfoTile(title: l10n.architecture, value: 'Clean Architecture · Provider'),
                 const Divider(height: 1, indent: 16),
                 ListTile(
                   leading: const Icon(Icons.code),
-                  title: const Text('Código fuente'),
+                  title: Text(l10n.sourceCode),
                   subtitle: const Text('github.com/MARIO-24/Horus_app',
                       style: TextStyle(fontSize: 12)),
                   trailing: const Icon(Icons.open_in_new, size: 18),
+                  onTap: () => launchUrl(
+                    Uri.parse('https://github.com/MARIO-24/Horus_app'),
+                    mode: LaunchMode.externalApplication,
+                  ),
                 ),
               ],
             ),
@@ -163,14 +178,14 @@ class OptionsScreen extends StatelessWidget {
     );
   }
 
-  String _themeModeLabel(ThemeMode mode) {
+  String _themeModeLabel(ThemeMode mode, AppL10n l10n) {
     switch (mode) {
       case ThemeMode.light:
-        return 'Claro';
+        return l10n.themeLight;
       case ThemeMode.dark:
-        return 'Oscuro';
+        return l10n.themeDark;
       case ThemeMode.system:
-        return 'Sistema (por defecto)';
+        return l10n.themeSystem;
     }
   }
 
