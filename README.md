@@ -206,7 +206,23 @@ build/app/outputs/flutter-apk/app-release.apk
 
 ---
 
-## 👨‍💻 Autor
+## � Historial de cambios (Changelog)
+
+| Hash | Tipo | Descripción |
+|------|------|-------------|
+| `e323364` | docs | README actualizado — bilingüe, distribución APK, DAM |
+| `b338bdb` | fix | Legibilidad modo claro/oscuro: iconos colores fijos, chips ejercicios, avatar chatbot opaco |
+| `e0aff07` | feat | Chatbot y rutinas bilingües EN/ES con Gemini, l10n pantalla cuenta y splash |
+| `f9b6192` | feat | Bandera UK 🇬🇧, locale `en-GB`, sugerencias rápidas del chatbot bilingües |
+| `d262a0d` | feat | L10n completa ES/EN, frase motivacional splash, drawer oscuro, proyecto DAM, icono negro |
+| `9b09b75` | feat | 7 mejoras UI: l10n, iconos, tema, splash, tamaño logos |
+| `c9da3ca` | feat | UI polish: iconos, splash, login, tema, launcher, idioma |
+| `d9b8c83` | feat | Tema dorado + iconos personalizados Horus, rama `feature/ui-icons` |
+| `3c62745` | feat | Commit inicial — HorusAPP TFG (arquitectura limpia, Firebase, Gemini, GoRouter) |
+
+---
+
+## �👨‍💻 Autor
 
 **Mario** — Trabajo de Fin de Grado  
 Grado Superior en Desarrollo de Aplicaciones Multiplataforma (DAM)
