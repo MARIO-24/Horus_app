@@ -32,7 +32,8 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     _inputCtrl.clear();
 
     final chatbotProvider = context.read<ChatbotProvider>();
-    await chatbotProvider.sendMessage(text);
+    final isEnglish = AppL10n.readFrom(context).isEnglish;
+    await chatbotProvider.sendMessage(text, isEnglish: isEnglish);
 
     // Scroll al último mensaje tras la respuesta
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -191,7 +192,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
           FilledButton(
             onPressed: () {
               Navigator.pop(context);
-              context.read<ChatbotProvider>().clearChat();
+              context.read<ChatbotProvider>().clearChat(isEnglish: l10n.isEnglish);
             },
             child: Text(l10n.clearChatConfirm),
           ),
@@ -206,17 +207,9 @@ class _QuickSuggestions extends StatelessWidget {
   final void Function(String) onTap;
   const _QuickSuggestions({required this.onTap});
 
-  static const List<String> suggestions = [
-    '¿Qué debo comer antes de entrenar?',
-    'Dame motivación 💪',
-    '¿Cuánto descanso entre series?',
-    'Consejos para perder grasa',
-    '¿Para qué sirve la creatina?',
-    'Ejercicio para abdominales',
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final suggestions = AppL10n.of(context).quickSuggestions;
     return SizedBox(
       height: 42,
       child: ListView.builder(

@@ -82,13 +82,14 @@ class _RoutineFormScreenState extends State<RoutineFormScreen> {
       weight: double.parse(_weightCtrl.text.replaceAll(',', '.')),
       height: double.parse(_heightCtrl.text.replaceAll(',', '.')),
       birthDate: _birthDate!,
+      isEnglish: l10n.isEnglish,
     );
 
     if (!mounted) return;
 
     if (routineProvider.status == RoutineStatus.loaded) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(l10n.routineSuccess),
           backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,

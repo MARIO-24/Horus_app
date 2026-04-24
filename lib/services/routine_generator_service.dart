@@ -20,26 +20,48 @@ class RoutineGeneratorService {
     required int daysPerWeek,
     required String gender,
     String trainingLocation = 'Gimnasio',
+    bool isEnglish = false,
   }) async {
     try {
-      final prompt =
-          'Genera una rutina de entrenamiento personalizada en formato JSON.\n\n'
-          'Perfil del usuario:\n'
-          '- Objetivo: $goal\n'
-          '- Nivel: $fitnessLevel\n'
-          '- Días por semana: $daysPerWeek\n'
-          '- Género: $gender\n'
-          '- Lugar de entrenamiento: $trainingLocation\n\n'
-          'Devuelve ÚNICAMENTE un array JSON con exactamente $daysPerWeek días. '
-          'Cada día debe tener este formato exacto:\n'
-          '[{"dayNumber":1,"dayName":"Día 1 — Nombre","focus":"Grupo muscular",'
-          '"exercises":[{"name":"Ejercicio","sets":3,"reps":"12","rest":"60s",'
-          '"notes":"Descripción breve de cómo ejecutar el ejercicio correctamente"}]}]\n\n'
-          'El campo "notes" es OBLIGATORIO en cada ejercicio: incluye una descripción '
-          'concisa (1-2 frases) sobre cómo realizar el ejercicio correctamente, '
-          'qué músculos trabaja y algún consejo clave de ejecución.\n'
-          'Cada día debe tener entre 4 y 7 ejercicios. Adapta al nivel y lugar. '
-          'Responde SOLO con el JSON, sin texto ni bloques markdown.';
+      final prompt = isEnglish
+          ? 'Generate a personalised workout routine in JSON format.\n\n'
+              'User profile:\n'
+              '- Goal: $goal\n'
+              '- Level: $fitnessLevel\n'
+              '- Days per week: $daysPerWeek\n'
+              '- Gender: $gender\n'
+              '- Training location: $trainingLocation\n\n'
+              'Return ONLY a JSON array with exactly $daysPerWeek days. '
+              'Each day must follow this exact format:\n'
+              '[{"dayNumber":1,"dayName":"Day 1 — Name","focus":"Muscle group",'
+              '"exercises":[{"name":"Exercise","sets":3,"reps":"12","rest":"60s",'
+              '"notes":"Brief description of how to perform the exercise correctly"}]}]\n\n'
+              'The "notes" field is MANDATORY for each exercise: include a concise description '
+              '(1-2 sentences) on how to perform the exercise, which muscles it targets and a '
+              'key execution tip.\n'
+              'Each day must have between 4 and 7 exercises. Adapt to the level and location. '
+              'Respond ONLY with the JSON, no text or markdown blocks.'
+          : 'Genera una rutina de entrenamiento personalizada en formato JSON.\n\n'
+              'Perfil del usuario:\n'
+              '- Objetivo: $goal\n'
+              '- Nivel: $fitnessLevel\n'
+              '- Días por semana: $daysPerWeek\n'
+              '- Género: $gender\n'
+              '- Lugar de entrenamiento: $trainingLocation\n\n'
+              'Devuelve ÚNICAMENTE un array JSON con exactamente $daysPerWeek días. '
+              'Cada día debe tener este formato exacto:\n'
+              '[{"dayNumber":1,"dayName":"Día 1 — Nombre","focus":"Grupo muscular",'
+              '"exercises":[{"name":"Ejercicio","sets":3,"reps":"12","rest":"60s",'
+              '"notes":"Descripción breve de cómo ejecutar el ejercicio correctamente"}]}]\n\n'
+              'El campo "notes" es OBLIGATORIO en cada ejercicio: incluye una descripción '
+              'concisa (1-2 frases) sobre cómo realizar el ejercicio correctamente, '
+              'qué músculos trabaja y algún consejo clave de ejecución.\n'
+              'Cada día debe tener entre 4 y 7 ejercicios. Adapta al nivel y lugar. '
+              'Responde SOLO con el JSON, sin texto ni bloques markdown.';
+
+      final systemInstruction = isEnglish
+          ? 'You are an expert personal trainer. You generate workout routines in valid JSON, without additional text.'
+          : 'Eres un entrenador personal experto. Generas rutinas de entrenamiento en JSON válido, sin texto adicional.';
 
       final response = await http
           .post(
@@ -51,11 +73,7 @@ class RoutineGeneratorService {
             body: jsonEncode({
               'system_instruction': {
                 'parts': [
-                  {
-                    'text':
-                        'Eres un entrenador personal experto. Generas rutinas '
-                            'de entrenamiento en JSON válido, sin texto adicional.'
-                  }
+                  {'text': systemInstruction}
                 ]
               },
               'contents': [

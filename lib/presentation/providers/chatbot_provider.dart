@@ -65,7 +65,7 @@ class ChatbotProvider extends ChangeNotifier {
   }
 
   /// Envía un mensaje del usuario y genera la respuesta del bot
-  Future<void> sendMessage(String text) async {
+  Future<void> sendMessage(String text, {bool isEnglish = false}) async {
     if (text.trim().isEmpty) return;
 
     _messages.add(ChatMessage(
@@ -87,7 +87,10 @@ class ChatbotProvider extends ChangeNotifier {
         .map((m) => {'role': m.isUser ? 'user' : 'model', 'text': m.text})
         .toList();
 
-    final response = await ChatbotService.generateResponse(text.trim(), history);
+    final response = await ChatbotService.generateResponse(
+      text.trim(), history,
+      isEnglish: isEnglish,
+    );
     _messages.add(ChatMessage(
       text: response,
       isUser: false,
@@ -100,10 +103,12 @@ class ChatbotProvider extends ChangeNotifier {
   }
 
   /// Limpia el historial del chat (UI + Firestore)
-  void clearChat() {
+  void clearChat({bool isEnglish = false}) {
     _messages.clear();
     _messages.add(ChatMessage(
-      text: '¡Chat reiniciado! ¿En qué te puedo ayudar? 💪',
+      text: isEnglish
+          ? 'Chat cleared! How can I help you? 💪'
+          : '¡Chat reiniciado! ¿En qué te puedo ayudar? 💪',
       isUser: false,
       timestamp: DateTime.now(),
     ));
