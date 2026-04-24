@@ -2,6 +2,7 @@
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
+import 'package:horus_app/core/config/secrets.dart';
 import 'package:http/http.dart' as http;
 
 /// Servicio de chatbot de HorusAPP.
@@ -13,7 +14,7 @@ class ChatbotService {
   static final Random _random = Random();
 
   // ── Gemini API ────────────────────────────────────────────────────────────
-  static const _apiKey = String.fromEnvironment('GEMINI_API_KEY');
+  static const _apiKey = AppSecrets.geminiApiKey;
   static const _endpoint =
       'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent';
 
