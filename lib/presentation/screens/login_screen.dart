@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:horus_app/core/l10n/app_l10n.dart';
 import 'package:horus_app/core/utils/validators.dart';
 import 'package:horus_app/presentation/providers/auth_provider.dart';
 import 'package:horus_app/presentation/providers/chatbot_provider.dart';
@@ -93,37 +94,34 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _showForgotPasswordDialog(BuildContext context) {
+    final l10n = AppL10n.of(context);
     final emailCtrl = TextEditingController(text: _emailCtrl.text.trim());
     final formKey = GlobalKey<FormState>();
 
     showDialog(
       context: context,
       builder: (dialogCtx) => AlertDialog(
-        title: const Text('Restablecer contraseña'),
+        title: Text(l10n.resetPasswordTitle),
         content: Form(
           key: formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Introduce tu email y te enviaremos un enlace para restablecer tu contraseña.',
-              ),
+              Text(l10n.resetPasswordBody),
               const SizedBox(height: 16),
               TextFormField(
                 controller: emailCtrl,
                 keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  prefixIcon: Icon(Icons.email_outlined),
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.emailLabel,
+                  prefixIcon: const Icon(Icons.email_outlined),
+                  border: const OutlineInputBorder(),
                 ),
                 validator: (v) {
-                  if (v == null || v.trim().isEmpty) {
-                    return 'El email es obligatorio';
-                  }
+                  if (v == null || v.trim().isEmpty) return l10n.emailRequired;
                   final re = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-                  if (!re.hasMatch(v.trim())) return 'Email no válido';
+                  if (!re.hasMatch(v.trim())) return l10n.emailInvalid;
                   return null;
                 },
               ),
@@ -133,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () async {
@@ -148,9 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     .sendPasswordResetEmail(email);
                 messenger.showSnackBar(
                   SnackBar(
-                    content: Text(
-                      'Enlace enviado a $email. Revisa tu bandeja de entrada.',
-                    ),
+                    content: Text(l10n.resetLinkSent(email)),
                     backgroundColor: Colors.green.shade700,
                     behavior: SnackBarBehavior.floating,
                   ),
@@ -165,7 +161,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 );
               }
             },
-            child: const Text('Enviar enlace'),
+            child: Text(l10n.sendLink),
           ),
         ],
       ),
@@ -176,6 +172,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isLoading = context.watch<AuthProvider>().isLoading;
+    final l10n = AppL10n.of(context);
 
     return Scaffold(
       body: Container(
@@ -219,7 +216,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Text(
-                            'Iniciar Sesión',
+                            l10n.loginTitle,
                             style: Theme.of(context)
                                 .textTheme
                                 .headlineSmall
@@ -229,8 +226,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           const SizedBox(height: 28),
 
                           CustomTextField(
-                            label: 'Email',
-                            hint: 'tu@email.com',
+                            label: l10n.emailLabel,
+                            hint: l10n.emailHint,
                             controller: _emailCtrl,
                             keyboardType: TextInputType.emailAddress,
                             prefixIcon: const Icon(Icons.email_outlined),
@@ -240,14 +237,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           const SizedBox(height: 16),
 
                           CustomTextField(
-                            label: 'Contraseña',
+                            label: l10n.passwordLabel,
                             controller: _passwordCtrl,
                             obscureText: true,
                             showPasswordToggle: true,
                             prefixIcon: const Icon(Icons.lock_outline),
                             validator: (v) {
                               if (v == null || v.isEmpty) {
-                                return 'La contraseña es obligatoria';
+                                return l10n.passwordRequired;
                               }
                               return null;
                             },
@@ -268,7 +265,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 tapTargetSize:
                                     MaterialTapTargetSize.shrinkWrap,
                               ),
-                              child: const Text('¿Olvidaste tu contraseña?'),
+                              child: Text(l10n.forgotPassword),
                             ),
                           ),
                           const SizedBox(height: 20),
@@ -278,7 +275,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             value: _rememberMe,
                             onChanged: (val) =>
                                 setState(() => _rememberMe = val ?? true),
-                            title: const Text('Mantener sesión iniciada'),
+                            title: Text(l10n.keepSession),
                             contentPadding: EdgeInsets.zero,
                             controlAffinity: ListTileControlAffinity.leading,
                             dense: true,
@@ -297,7 +294,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       color: Colors.white,
                                     ),
                                   )
-                                : const Text('Entrar'),
+                                : Text(l10n.loginButton),
                           ),
 
                           const SizedBox(height: 16),
@@ -306,11 +303,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Text('¿No tienes cuenta?'),
+                              Text(l10n.noAccount),
                               TextButton(
                                 onPressed: () =>
                                     context.go(AppRoutes.register),
-                                child: const Text('Regístrate'),
+                                child: Text(l10n.registerLink),
                               ),
                             ],
                           ),

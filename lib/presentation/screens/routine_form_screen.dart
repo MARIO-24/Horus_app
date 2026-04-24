@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:horus_app/core/constants/app_constants.dart';
+import 'package:horus_app/core/l10n/app_l10n.dart';
 import 'package:horus_app/core/utils/validators.dart';
 import 'package:horus_app/presentation/providers/auth_provider.dart';
 import 'package:horus_app/presentation/providers/routine_provider.dart';
@@ -56,6 +57,8 @@ class _RoutineFormScreenState extends State<RoutineFormScreen> {
   Future<void> _generate() async {
     if (!_formKey.currentState!.validate()) return;
 
+    final l10n = AppL10n.readFrom(context);
+
     // Validación adicional de fecha
     final dateError = Validators.validateBirthDate(_birthDate);
     if (dateError != null) {
@@ -86,7 +89,7 @@ class _RoutineFormScreenState extends State<RoutineFormScreen> {
     if (routineProvider.status == RoutineStatus.loaded) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('¡Rutina generada con éxito! 💪'),
+          content: Text(l10n.routineSuccess),
           backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
         ),
@@ -96,7 +99,7 @@ class _RoutineFormScreenState extends State<RoutineFormScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-              routineProvider.errorMessage ?? 'Error al generar la rutina'),
+              routineProvider.errorMessage ?? l10n.routineError),
           backgroundColor: Colors.red,
         ),
       );
@@ -107,10 +110,11 @@ class _RoutineFormScreenState extends State<RoutineFormScreen> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isLoading = context.watch<RoutineProvider>().isLoading;
+    final l10n = AppL10n.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Generar Rutina'),
+        title: Text(l10n.routineFormTitle),
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => context.pop(),
@@ -135,7 +139,7 @@ class _RoutineFormScreenState extends State<RoutineFormScreen> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'Completa tu perfil y generaremos una rutina personalizada con IA',
+                          l10n.routineFormSubtitle,
                           style: TextStyle(color: colorScheme.primary),
                         ),
                       ),
@@ -146,14 +150,14 @@ class _RoutineFormScreenState extends State<RoutineFormScreen> {
               const SizedBox(height: 20),
 
               // ── Fecha de nacimiento ───────────────────────────────────
-              _SectionLabel(text: 'Datos personales'),
+              _SectionLabel(text: l10n.personalData),
               const SizedBox(height: 12),
               GestureDetector(
                 onTap: _pickDate,
                 child: AbsorbPointer(
                   child: CustomTextField(
-                    label: 'Fecha de nacimiento',
-                    hint: 'Selecciona tu fecha',
+                    label: l10n.birthDate,
+                    hint: l10n.birthDateHint,
                     readOnly: true,
                     prefixIcon: const Icon(Icons.cake_outlined),
                     controller: TextEditingController(
@@ -173,8 +177,8 @@ class _RoutineFormScreenState extends State<RoutineFormScreen> {
                 children: [
                   Expanded(
                     child: CustomTextField(
-                      label: 'Peso (kg)',
-                      hint: 'Ej: 75',
+                      label: l10n.weightLabel,
+                      hint: l10n.weightHint,
                       controller: _weightCtrl,
                       keyboardType: const TextInputType.numberWithOptions(
                           decimal: true),
@@ -186,8 +190,8 @@ class _RoutineFormScreenState extends State<RoutineFormScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: CustomTextField(
-                      label: 'Altura (cm)',
-                      hint: 'Ej: 175',
+                      label: l10n.heightLabel,
+                      hint: l10n.heightHint,
                       controller: _heightCtrl,
                       keyboardType: const TextInputType.numberWithOptions(
                           decimal: true),
@@ -200,35 +204,40 @@ class _RoutineFormScreenState extends State<RoutineFormScreen> {
               const SizedBox(height: 20),
 
               // ── Género ────────────────────────────────────────────────
-              _SectionLabel(text: 'Género'),
+              _SectionLabel(text: l10n.genderLabel),
               const SizedBox(height: 8),
               _OptionChips<String>(
                 options: AppConstants.genderOptions,
                 selected: _gender,
+                labels: l10n.genderOptions,
                 onSelected: (v) => setState(() => _gender = v),
               ),
               const SizedBox(height: 20),
 
               // ── Nivel físico ──────────────────────────────────────────
-              _SectionLabel(text: 'Nivel físico'),
+              _SectionLabel(text: l10n.fitnessLevelLabel),
               const SizedBox(height: 8),
               _OptionChips<String>(
                 options: AppConstants.fitnessLevelOptions,
                 selected: _fitnessLevel,
+                labels: l10n.fitnessOptions,
                 onSelected: (v) => setState(() => _fitnessLevel = v),
               ),
               const SizedBox(height: 20),
 
               // ── Objetivo ──────────────────────────────────────────────
-              _SectionLabel(text: 'Objetivo de entrenamiento'),
+              _SectionLabel(text: l10n.goalLabel2),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: AppConstants.goalOptions.map((goal) {
+                children: AppConstants.goalOptions.asMap().entries.map((e) {
+                  final idx = e.key;
+                  final goal = e.value;
                   final isSelected = _goal == goal;
+                  final label = l10n.goalOptions[idx];
                   return ChoiceChip(
-                    label: Text(goal),
+                    label: Text(label),
                     selected: isSelected,
                     onSelected: (_) => setState(() => _goal = goal),
                     selectedColor:
@@ -252,8 +261,7 @@ class _RoutineFormScreenState extends State<RoutineFormScreen> {
               const SizedBox(height: 20),
 
               // ── Días de entrenamiento ──────────────────────────────────
-              _SectionLabel(
-                  text: 'Días de entrenamiento por semana: $_daysPerWeek'),
+              _SectionLabel(text: l10n.daysPerWeekLabel(_daysPerWeek)),
               const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -298,11 +306,12 @@ class _RoutineFormScreenState extends State<RoutineFormScreen> {
               const SizedBox(height: 20),
 
               // ── ¿Dónde entrenas? ──────────────────────────────────────
-              _SectionLabel(text: '¿Dónde entrenas?'),
+              _SectionLabel(text: l10n.trainingLocationLabel),
               const SizedBox(height: 8),
               _OptionChips<String>(
                 options: AppConstants.trainingLocationOptions,
                 selected: _trainingLocation,
+                labels: l10n.locationOptions,
                 onSelected: (v) => setState(() => _trainingLocation = v),
               ),
               const SizedBox(height: 32),
@@ -318,7 +327,7 @@ class _RoutineFormScreenState extends State<RoutineFormScreen> {
                             strokeWidth: 2, color: Colors.white),
                       )
                     : const Icon(Icons.auto_awesome),
-                label: Text(isLoading ? 'Generando...' : 'Generar mi rutina'),
+                label: Text(isLoading ? l10n.generatingLabel : l10n.generateRoutine),
                 style: FilledButton.styleFrom(
                   minimumSize: const Size.fromHeight(54),
                 ),
@@ -354,11 +363,14 @@ class _OptionChips<T> extends StatelessWidget {
   final List<T> options;
   final T selected;
   final void Function(T) onSelected;
+  /// Etiquetas opcionales; si se omiten, se usa `opt.toString()`
+  final List<String>? labels;
 
   const _OptionChips({
     required this.options,
     required this.selected,
     required this.onSelected,
+    this.labels,
   });
 
   @override
@@ -367,11 +379,14 @@ class _OptionChips<T> extends StatelessWidget {
     return Wrap(
       spacing: 8,
       runSpacing: 8,
-      children: options.map((opt) {
+      children: options.asMap().entries.map((entry) {
+        final idx = entry.key;
+        final opt = entry.value;
         final isSelected = selected == opt;
+        final displayLabel = labels != null ? labels![idx] : opt.toString();
         return ChoiceChip(
           label: Text(
-            opt.toString(),
+            displayLabel,
             textAlign: TextAlign.center,
           ),
           selected: isSelected,

@@ -93,7 +93,7 @@ class AppTheme {
           ),
         ),
         drawerTheme: const DrawerThemeData(
-          backgroundColor: Color(0xFFE8DCC0),
+          backgroundColor: Color(0xFF1A1A2E),
         ),
       );
 

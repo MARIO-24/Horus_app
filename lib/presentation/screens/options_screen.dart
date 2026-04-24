@@ -105,7 +105,7 @@ class OptionsScreen extends StatelessWidget {
                   subtitle: Text(l10n.deleteRoutineSubtitle),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () =>
-                      _showDeleteRoutineDialog(context),
+                      _showDeleteRoutineDialog(context, l10n),
                 ),
               ],
             ),
@@ -121,7 +121,7 @@ class OptionsScreen extends StatelessWidget {
                   leading: const Icon(Icons.logout, color: Colors.blue),
                   title: Text(l10n.logout),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _showLogoutDialog(context),
+                  onTap: () => _showLogoutDialog(context, l10n),
                 ),
                 const Divider(height: 1, indent: 16),
                 ListTile(
@@ -137,7 +137,7 @@ class OptionsScreen extends StatelessWidget {
                   ),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () =>
-                      _showDeleteAccountDialog(context),
+                      _showDeleteAccountDialog(context, l10n),
                 ),
               ],
             ),
@@ -153,7 +153,7 @@ class OptionsScreen extends StatelessWidget {
                 const Divider(height: 1, indent: 16),
                 _InfoTile(title: l10n.developer, value: 'Rufito'),
                 const Divider(height: 1, indent: 16),
-                _InfoTile(title: l10n.project, value: 'TFG — Grado en Ingeniería Informática'),
+                _InfoTile(title: l10n.project, value: 'TFG — Grado Superior DAM'),
                 const Divider(height: 1, indent: 16),
                 _InfoTile(title: l10n.technologies, value: 'Flutter · Firebase · Gemini AI'),
                 const Divider(height: 1, indent: 16),
@@ -200,23 +200,22 @@ class OptionsScreen extends StatelessWidget {
     }
   }
 
-  void _showDeleteRoutineDialog(BuildContext context) {
+  void _showDeleteRoutineDialog(BuildContext context, AppL10n l10n) {
     final routineProvider = context.read<RoutineProvider>();
     if (!routineProvider.hasRoutine) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('No tienes ninguna rutina activa')));
+          .showSnackBar(SnackBar(content: Text(l10n.noActiveRoutine)));
       return;
     }
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Eliminar rutina'),
-        content: const Text(
-            '¿Seguro que quieres eliminar tu rutina actual? Podrás crear una nueva cuando quieras.'),
+        title: Text(l10n.deleteRoutineTitle),
+        content: Text(l10n.deleteRoutineBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.orange),
@@ -226,30 +225,30 @@ class OptionsScreen extends StatelessWidget {
               await routineProvider.deleteRoutine(uid);
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Rutina eliminada'),
+                  SnackBar(
+                    content: Text(l10n.routineDeleted),
                     behavior: SnackBarBehavior.floating,
                   ),
                 );
               }
             },
-            child: const Text('Eliminar'),
+            child: Text(l10n.deleteConfirm),
           ),
         ],
       ),
     );
   }
 
-  void _showLogoutDialog(BuildContext context) {
+  void _showLogoutDialog(BuildContext context, AppL10n l10n) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Cerrar sesión'),
-        content: const Text('¿Seguro que quieres cerrar sesión?'),
+        title: Text(l10n.logoutTitle),
+        content: Text(l10n.logoutBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () async {
@@ -259,14 +258,14 @@ class OptionsScreen extends StatelessWidget {
               context.read<UserProvider>().clear();
               context.read<ChatbotProvider>().clear();
             },
-            child: const Text('Cerrar sesión'),
+            child: Text(l10n.logoutConfirm),
           ),
         ],
       ),
     );
   }
 
-  void _showDeleteAccountDialog(BuildContext context) {
+  void _showDeleteAccountDialog(BuildContext context, AppL10n l10n) {
     final passwordCtrl = TextEditingController();
     bool obscure = true;
 
@@ -274,25 +273,23 @@ class OptionsScreen extends StatelessWidget {
       context: context,
       builder: (dialogCtx) => StatefulBuilder(
         builder: (dialogCtx, setDialogState) => AlertDialog(
-          title: const Text('Eliminar cuenta'),
+          title: Text(l10n.deleteAccountTitle),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                '⚠️ Esta acción es permanente. Se eliminarán tu cuenta y todos tus datos.',
-              ),
+              Text(l10n.deleteAccountWarning),
               const SizedBox(height: 16),
-              const Text(
-                'Introduce tu contraseña para confirmar:',
-                style: TextStyle(fontWeight: FontWeight.bold),
+              Text(
+                l10n.enterPasswordConfirm,
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: passwordCtrl,
                 obscureText: obscure,
                 decoration: InputDecoration(
-                  hintText: 'Contraseña',
+                  hintText: l10n.passwordHint,
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -307,7 +304,7 @@ class OptionsScreen extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogCtx),
-              child: const Text('Cancelar'),
+              child: Text(l10n.cancel),
             ),
             FilledButton(
               style: FilledButton.styleFrom(backgroundColor: Colors.red),
@@ -340,8 +337,8 @@ class OptionsScreen extends StatelessWidget {
                 } on FirebaseAuthException catch (e) {
                   final msg = e.code == 'wrong-password' ||
                           e.code == 'invalid-credential'
-                      ? 'Contraseña incorrecta'
-                      : 'Error al eliminar la cuenta: ${e.message}';
+                      ? l10n.wrongPassword
+                      : l10n.deleteAccountError(e.message ?? '');
                   messenger.showSnackBar(
                     SnackBar(
                       content: Text(msg),
@@ -351,20 +348,19 @@ class OptionsScreen extends StatelessWidget {
                 } catch (e) {
                   messenger.showSnackBar(
                     SnackBar(
-                      content: Text('Error inesperado: $e'),
+                      content: Text(l10n.unexpectedError(e.toString())),
                       backgroundColor: Colors.red,
                     ),
                   );
                 }
               },
-              child: const Text('Eliminar'),
+              child: Text(l10n.deleteConfirm),
             ),
           ],
         ),
       ),
     );
   }
-}
 
 /// Encabezado de sección
 class _SectionHeader extends StatelessWidget {
@@ -376,17 +372,19 @@ class _SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isLight = Theme.of(context).brightness == Brightness.light;
     return Padding(
       padding: const EdgeInsets.fromLTRB(4, 0, 0, 10),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: colorScheme.primary),
+          Icon(icon, size: 18,
+              color: isLight ? colorScheme.onSurface : colorScheme.primary),
           const SizedBox(width: 6),
           Text(
             title,
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: colorScheme.primary,
+                  color: isLight ? colorScheme.onSurface : colorScheme.primary,
                 ),
           ),
         ],

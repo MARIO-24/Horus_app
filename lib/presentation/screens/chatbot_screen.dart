@@ -83,8 +83,8 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.delete_outline),
-            tooltip: 'Limpiar chat',
-            onPressed: () => _showClearDialog(context),
+            tooltip: l10n.clearChat,
+            onPressed: () => _showClearDialog(context, l10n),
           ),
         ],
       ),
@@ -140,7 +140,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                       focusNode: _focusNode,
                       textCapitalization: TextCapitalization.sentences,
                       decoration: InputDecoration(
-                        hintText: 'Pregunta algo sobre fitness...',
+                        hintText: l10n.messagePlaceholder,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(24),
                           borderSide: BorderSide.none,
@@ -177,23 +177,23 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     _send();
   }
 
-  void _showClearDialog(BuildContext context) {
+  void _showClearDialog(BuildContext context, AppL10n l10n) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Limpiar chat'),
-        content: const Text('¿Quieres borrar el historial de mensajes?'),
+        title: Text(l10n.clearChatTitle),
+        content: Text(l10n.clearChatBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () {
               Navigator.pop(context);
               context.read<ChatbotProvider>().clearChat();
             },
-            child: const Text('Limpiar'),
+            child: Text(l10n.clearChatConfirm),
           ),
         ],
       ),
