@@ -197,21 +197,11 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 const SizedBox(height: 40),
 
-                // ── Logo y título ─────────────────────────────────────
+                // ── Logo ────────────────────────────────────────
                 Image.asset(
                   'iconos/Logo_HorusApp.png',
-                  width: 120,
-                  height: 120,
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'HorusAPP',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 2,
-                  ),
+                  width: 160,
+                  height: 160,
                 ),
                 const SizedBox(height: 48),
 

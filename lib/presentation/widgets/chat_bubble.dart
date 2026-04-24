@@ -30,18 +30,11 @@ class ChatBubble extends StatelessWidget {
           if (!isUser) ...[
             CircleAvatar(
               radius: 16,
-              backgroundColor: colorScheme.primary,
-              child: const Text(
-                'H',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-          ],
+              backgroundColor: Colors.transparent,
+              child: Image.asset(
+                'iconos/Icono_ChatBot.png',
+                width: 32,
+                height: 32,
 
           // Burbuja del mensaje
           Flexible(
@@ -168,14 +161,11 @@ class _TypingIndicatorState extends State<TypingIndicator>
         children: [
           CircleAvatar(
             radius: 16,
-            backgroundColor: colorScheme.primary,
-            child: const Text(
-              'H',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
+            backgroundColor: Colors.transparent,
+            child: Image.asset(
+              'iconos/Icono_ChatBot.png',
+              width: 32,
+              height: 32,
             ),
           ),
           const SizedBox(width: 8),

@@ -103,27 +103,10 @@ class _SplashScreenState extends State<SplashScreen>
                   // ── Logo ──────────────────────────────────────────────
                   ScaleTransition(
                     scale: _scaleAnim,
-                    child: Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.15),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.4),
-                          width: 2,
-                        ),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'H',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 64,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
+                    child: Image.asset(
+                      'iconos/Logo_HorusApp.png',
+                      width: 160,
+                      height: 160,
                     ),
                   ),
                   const SizedBox(height: 24),

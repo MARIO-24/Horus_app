@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
 import 'package:flutter/material.dart';
 import 'package:horus_app/presentation/providers/auth_provider.dart';
 import 'package:horus_app/presentation/providers/chatbot_provider.dart';
+import 'package:horus_app/presentation/providers/locale_provider.dart';
 import 'package:horus_app/presentation/providers/routine_provider.dart';
 import 'package:horus_app/presentation/providers/theme_provider.dart';
 import 'package:horus_app/presentation/providers/user_provider.dart';
@@ -15,6 +16,7 @@ class OptionsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
+    final localeProvider = context.watch<LocaleProvider>();
 
     return Scaffold(
       appBar: AppBar(title: const Text('Opciones')),
@@ -43,6 +45,38 @@ class OptionsScreen extends StatelessWidget {
                   selected: isSelected,
                 );
               }).toList(),
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // ── Idioma ──────────────────────────────────────────────────
+          _SectionHeader(title: 'Idioma', icon: Icons.language),
+          Card(
+            child: Column(
+              children: [
+                RadioListTile<Locale>(
+                  value: const Locale('es', 'ES'),
+                  groupValue: localeProvider.locale,
+                  title: const Text('Español'),
+                  secondary: const Text('🇪🇸', style: TextStyle(fontSize: 20)),
+                  onChanged: (v) {
+                    if (v != null) localeProvider.setLocale(v);
+                  },
+                  activeColor: Theme.of(context).colorScheme.primary,
+                  selected: localeProvider.locale.languageCode == 'es',
+                ),
+                RadioListTile<Locale>(
+                  value: const Locale('en', 'US'),
+                  groupValue: localeProvider.locale,
+                  title: const Text('English'),
+                  secondary: const Text('🇺🇸', style: TextStyle(fontSize: 20)),
+                  onChanged: (v) {
+                    if (v != null) localeProvider.setLocale(v);
+                  },
+                  activeColor: Theme.of(context).colorScheme.primary,
+                  selected: localeProvider.locale.languageCode == 'en',
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 24),
@@ -104,17 +138,23 @@ class OptionsScreen extends StatelessWidget {
           Card(
             child: Column(
               children: [
-                _InfoTile(
-                    title: 'HorusAPP',
-                    value: 'v1.0.0'),
+                _InfoTile(title: 'Aplicación', value: 'HorusAPP v1.0.0'),
                 const Divider(height: 1, indent: 16),
-                _InfoTile(
-                    title: 'Desarrollado con',
-                    value: 'Flutter + Firebase'),
+                _InfoTile(title: 'Desarrollador', value: 'Mario'),
                 const Divider(height: 1, indent: 16),
-                _InfoTile(
-                    title: 'Arquitectura',
-                    value: 'Clean Architecture'),
+                _InfoTile(title: 'Proyecto', value: 'TFG — Grado en Ingeniería Informática'),
+                const Divider(height: 1, indent: 16),
+                _InfoTile(title: 'Tecnologías', value: 'Flutter · Firebase · Gemini AI'),
+                const Divider(height: 1, indent: 16),
+                _InfoTile(title: 'Arquitectura', value: 'Clean Architecture · Provider'),
+                const Divider(height: 1, indent: 16),
+                ListTile(
+                  leading: const Icon(Icons.code),
+                  title: const Text('Código fuente'),
+                  subtitle: const Text('github.com/MARIO-24/Horus_app',
+                      style: TextStyle(fontSize: 12)),
+                  trailing: const Icon(Icons.open_in_new, size: 18),
+                ),
               ],
             ),
           ),

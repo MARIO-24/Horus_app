@@ -276,7 +276,16 @@ class _AccountScreenState extends State<AccountScreen> {
             : 'Atleta');
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mi Cuenta')),
+      appBar: AppBar(
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset('iconos/Icono_Cuenta.png', width: 28, height: 28),
+            const SizedBox(width: 10),
+            const Text('Mi Cuenta'),
+          ],
+        ),
+      ),
       drawer: const CustomDrawer(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

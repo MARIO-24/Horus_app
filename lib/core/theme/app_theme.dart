@@ -8,6 +8,8 @@ class AppTheme {
   // ── Colores principales ───────────────────────────────────────────────────
   static const Color _primarySeed = Color(0xFFC9A84C); // Dorado Horus
   static const Color _darkNavy   = Color(0xFF1A1A2E);  // Azul noche oscuro
+  static const Color _lightBg    = Color(0xFFFAF7F0);  // Crema cálido
+  static const Color _lightCard  = Color(0xFFFFFFFF);
 
   // ── Tema claro ────────────────────────────────────────────────────────────
   static ThemeData get lightTheme => ThemeData(
@@ -16,7 +18,11 @@ class AppTheme {
           seedColor: _primarySeed,
           secondary: _darkNavy,
           brightness: Brightness.light,
+        ).copyWith(
+          surface: _lightBg,
+          onSurface: const Color(0xFF1A1A2E),
         ),
+        scaffoldBackgroundColor: _lightBg,
         textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme),
         appBarTheme: AppBarTheme(
           backgroundColor: _darkNavy,
@@ -30,20 +36,46 @@ class AppTheme {
           ),
         ),
         cardTheme: CardThemeData(
-          elevation: 3,
+          elevation: 2,
+          color: _lightCard,
+          shadowColor: const Color(0xFFC9A84C).withValues(alpha: 0.15),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(color: Color(0xFFE8DCC8), width: 0.8),
           ),
           margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         ),
         inputDecorationTheme: InputDecorationTheme(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFFD4B483)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFFD4B483), width: 1),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFFC9A84C), width: 2),
           ),
           filled: true,
-          fillColor: Colors.grey.shade100,
+          fillColor: const Color(0xFFFFF9EE),
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        ),
+        filledButtonTheme: FilledButtonThemeData(
+          style: FilledButton.styleFrom(
+            backgroundColor: _primarySeed,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+            textStyle: GoogleFonts.inter(
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
+            ),
+          ),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
@@ -61,7 +93,7 @@ class AppTheme {
           ),
         ),
         drawerTheme: const DrawerThemeData(
-          backgroundColor: Color(0xFFF5F5F5),
+          backgroundColor: Color(0xFFFAF7F0),
         ),
       );
 

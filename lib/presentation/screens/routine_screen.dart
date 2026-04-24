@@ -48,7 +48,14 @@ class RoutineScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mi Rutina'),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset('iconos/Icono_Rutina.png', width: 28, height: 28),
+            const SizedBox(width: 10),
+            const Text('Mi Rutina'),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
