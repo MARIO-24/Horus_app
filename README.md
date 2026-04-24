@@ -31,6 +31,7 @@
 | 📊 **Historial de chat** | Conversaciones persistidas por usuario en Firestore |
 | 🌗 **Tema claro/oscuro** | Soporte completo de tema dinámico con Material 3 |
 | 🗑️ **Gestión de cuenta** | Eliminación de cuenta con borrado completo de datos (Firestore + Storage) |
+| 🌍 **Bilingüe ES / EN** | Toda la UI, prompts de IA y sugerencias del chatbot en español e inglés |
 
 ---
 
@@ -67,12 +68,14 @@ lib/
 - Límite de tokens: 350 por respuesta (velocidad optimizada)
 - Fallback automático: sistema local de palabras clave si la API no está disponible
 - Persistencia: historial guardado en Firestore por `uid` de usuario
+- **Bilingüe**: prompts del sistema y sugerencias rápidas en ES 🇪🇸 / EN 🇬🇧
 
 ### Generador de rutinas
 - Motor principal: **Gemini 2.5 Flash Lite** — genera JSON estructurado con ejercicios
 - Cada ejercicio incluye: nombre, series, repeticiones, descanso y **descripción de ejecución**
 - Fallback automático: banco de rutinas pre-diseñadas por objetivo y nivel
 - Parámetros: objetivo, nivel, días/semana, género, lugar de entrenamiento
+- **Bilingüe**: rutinas generadas en el idioma seleccionado por el usuario
 
 ---
 
@@ -182,21 +185,37 @@ chats/{uid}
 
 ---
 
+## 📦 Distribución del APK (Android)
+
+### Generar APK de release
+```bash
+flutter build apk --release
+```
+El APK se genera en:
+```
+build/app/outputs/flutter-apk/app-release.apk
+```
+
+### Compartir con otros dispositivos Android
+1. **Google Drive / WhatsApp / email**: sube o envía el archivo `app-release.apk`
+2. El receptor debe activar **"Instalar apps de fuentes desconocidas"** en su dispositivo:
+   - Ajustes → Seguridad → Instalar apps desconocidas (varía según fabricante)
+3. Abre el APK en el dispositivo → toca **Instalar**
+
+> ⚠️ Los dispositivos receptores necesitan Android 7.0+ para compatibilidad total.
+
+---
+
 ## 👨‍💻 Autor
 
 **Mario** — Trabajo de Fin de Grado  
-Grado en Ingeniería Informática
+Grado Superior en Desarrollo de Aplicaciones Multiplataforma (DAM)
 
 ---
 
 ## 📄 Licencia
 
 Este proyecto está bajo la licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
-
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
 
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
