@@ -87,6 +87,54 @@ class AppL10n {
   String get alreadyAccount     => _en ? 'Already have an account?'  : '¿Ya tienes cuenta?';
   String get loginLink          => _en ? 'Sign in'                   : 'Inicia sesión';
   String get registerError      => _en ? 'Error creating account'    : 'Error al registrarse';
+  String get termsAccept        => _en ? 'I accept the '             : 'Acepto los ';
+  String get termsLink          => _en ? 'Terms and Conditions'      : 'Términos y Condiciones';
+  String get termsRequired      => _en
+      ? 'You must accept the Terms and Conditions to register'
+      : 'Debes aceptar los Términos y Condiciones para registrarte';
+  String get termsTitle         => _en ? 'Terms and Conditions'      : 'Términos y Condiciones';
+  String get termsContent       => _en
+      ? '''Welcome to HorusAPP.
+
+By creating an account you agree to the following terms:
+
+1. USE OF THE APP
+HorusAPP is an AI-powered fitness app for educational and personal use. The routines and advice generated do not replace professional medical or sports guidance.
+
+2. PERSONAL DATA
+We collect your name, email, and training data to personalise your experience. Data is stored securely in Firebase and is never shared with third parties.
+
+3. HEALTH RESPONSIBILITY
+Consult a health professional before starting any training programme. HorusAPP is not responsible for injuries resulting from improper use of the routines.
+
+4. ACCOUNT
+You are responsible for keeping your credentials confidential. Notify us immediately of any unauthorised use.
+
+5. MODIFICATIONS
+We may update these terms at any time. Continued use of the app implies acceptance of the updated terms.
+
+Thank you for trusting HorusAPP. Train smart, train safe.'''
+      : '''Bienvenido a HorusAPP.
+
+Al crear una cuenta aceptas los siguientes términos:
+
+1. USO DE LA APLICACIÓN
+HorusAPP es una app de fitness asistida por IA de uso educativo y personal. Las rutinas y consejos generados no sustituyen la orientación médica o deportiva profesional.
+
+2. DATOS PERSONALES
+Recogemos tu nombre, email y datos de entrenamiento para personalizar tu experiencia. Los datos se almacenan de forma segura en Firebase y nunca se comparten con terceros.
+
+3. RESPONSABILIDAD DE SALUD
+Consulta a un profesional de la salud antes de comenzar cualquier programa de entrenamiento. HorusAPP no se hace responsable de lesiones derivadas del uso inadecuado de las rutinas.
+
+4. CUENTA
+Eres responsable de mantener tus credenciales confidenciales. Notifícanos de inmediato cualquier uso no autorizado.
+
+5. MODIFICACIONES
+Podemos actualizar estos términos en cualquier momento. El uso continuado de la app implica la aceptación de los términos actualizados.
+
+Gracias por confiar en HorusAPP. Entrena inteligente, entrena seguro.''';
+  String get termsClose         => _en ? 'Close'                     : 'Cerrar';
 
   // ── Routine form ──────────────────────────────────────────────────────────
   String get routineFormTitle   => _en ? 'Generate Routine'          : 'Generar Rutina';

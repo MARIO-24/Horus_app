@@ -28,6 +28,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordCtrl = TextEditingController();
   final _confirmCtrl = TextEditingController();
   File? _avatarFile; // foto seleccionada antes del registro
+  bool _acceptedTerms = false;
+  bool _termsError = false;
 
   @override
   void dispose() {
@@ -49,7 +51,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _onRegister() async {
-    if (!_formKey.currentState!.validate()) return;
+    final isFormValid = _formKey.currentState!.validate();
+    if (!_acceptedTerms) {
+      setState(() => _termsError = true);
+    }
+    if (!isFormValid || !_acceptedTerms) return;
 
     final authProvider = context.read<AuthProvider>();
     final userProvider = context.read<UserProvider>();
@@ -87,6 +93,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
         content: Text(message),
         backgroundColor: Colors.red.shade600,
         behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _showTermsDialog() {
+    final l10n = AppL10n.readFrom(context);
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.termsTitle),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: SingleChildScrollView(
+            child: Text(l10n.termsContent),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l10n.termsClose),
+          ),
+        ],
       ),
     );
   }
@@ -279,6 +307,69 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             onFieldSubmitted: (_) => _onRegister(),
                           ),
                           const SizedBox(height: 28),
+
+                          // ── Términos y condiciones ──────────────────
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Checkbox(
+                                    value: _acceptedTerms,
+                                    onChanged: (v) => setState(() {
+                                      _acceptedTerms = v ?? false;
+                                      if (_acceptedTerms) _termsError = false;
+                                    }),
+                                    activeColor: colorScheme.primary,
+                                    materialTapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                    visualDensity: VisualDensity.compact,
+                                  ),
+                                  Expanded(
+                                    child: Wrap(
+                                      crossAxisAlignment:
+                                          WrapCrossAlignment.center,
+                                      children: [
+                                        Text(l10n.termsAccept,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium),
+                                        GestureDetector(
+                                          onTap: _showTermsDialog,
+                                          child: Text(
+                                            l10n.termsLink,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.copyWith(
+                                                  color: colorScheme.primary,
+                                                  decoration:
+                                                      TextDecoration.underline,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (_termsError)
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(left: 12, top: 4),
+                                  child: Text(
+                                    l10n.termsRequired,
+                                    style: TextStyle(
+                                      color: colorScheme.error,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
 
                           // ── Botón registrarse ───────────────────────
                           FilledButton(
