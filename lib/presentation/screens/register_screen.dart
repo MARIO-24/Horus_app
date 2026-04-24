@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:horus_app/core/l10n/app_l10n.dart';
 import 'package:horus_app/core/utils/validators.dart';
 import 'package:horus_app/presentation/providers/auth_provider.dart';
 import 'package:horus_app/presentation/providers/chatbot_provider.dart';
@@ -97,6 +98,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isLoading = context.watch<AuthProvider>().isLoading;
+    final l10n = AppL10n.of(context);
 
     return Scaffold(
       body: Container(
@@ -121,10 +123,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           color: Colors.white),
                       onPressed: () => context.go(AppRoutes.login),
                     ),
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        'Crear cuenta',
-                        style: TextStyle(
+                        l10n.registerTitle,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -151,7 +153,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Text(
-                            'Únete a HorusAPP',
+                            l10n.joinTitle,
                             style: Theme.of(context)
                                 .textTheme
                                 .headlineSmall
@@ -160,7 +162,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Completa los datos para crear tu cuenta',
+                            l10n.joinSubtitle,
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium
@@ -231,8 +233,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                           // Nombre
                           CustomTextField(
-                            label: 'Nombre completo',
-                            hint: 'María García',
+                            label: l10n.nameLabel,
+                            hint: l10n.nameHint,
                             controller: _nameCtrl,
                             prefixIcon: const Icon(Icons.person_outline),
                             validator: Validators.validateName,
@@ -242,8 +244,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                           // Email
                           CustomTextField(
-                            label: 'Email',
-                            hint: 'tu@email.com',
+                            label: l10n.emailLabel,
+                            hint: l10n.emailHint,
                             controller: _emailCtrl,
                             keyboardType: TextInputType.emailAddress,
                             prefixIcon: const Icon(Icons.email_outlined),
@@ -254,7 +256,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                           // Contraseña
                           CustomTextField(
-                            label: 'Contraseña',
+                            label: l10n.passwordLabel,
                             hint: 'Mín. 8 caracteres',
                             controller: _passwordCtrl,
                             obscureText: true,
@@ -267,7 +269,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                           // Confirmar contraseña
                           CustomTextField(
-                            label: 'Confirmar contraseña',
+                            label: l10n.confirmPassword,
                             controller: _confirmCtrl,
                             obscureText: true,
                             showPasswordToggle: true,
@@ -293,7 +295,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       color: Colors.white,
                                     ),
                                   )
-                                : const Text('Crear cuenta'),
+                                : Text(l10n.registerButton),
                           ),
 
                           const SizedBox(height: 16),
@@ -301,11 +303,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Text('¿Ya tienes cuenta?'),
+                              Text(l10n.alreadyAccount),
                               TextButton(
                                 onPressed: () =>
                                     context.go(AppRoutes.login),
-                                child: const Text('Inicia sesión'),
+                                child: Text(l10n.loginLink),
                               ),
                             ],
                           ),

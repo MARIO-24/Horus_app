@@ -16,22 +16,32 @@ class ChatbotService {
   static const _apiKey = 'AIzaSyDe3cMX6FPSar6ucmMWqbMZ0HjN8SfyvtM';
   static const _endpoint =
       'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent';
-  static const _systemPrompt =
-      'Eres Horus, el entrenador personal virtual de HorusAPP. '
-      'Tu especialidad es el fitness, la nutrición deportiva, el entrenamiento con pesas, '
-      'el cardio, la recuperación muscular y la salud en general. '
-      'Responde SIEMPRE en español, con un tono cercano, motivador y directo. '
-      'Sé conciso (máximo 3-4 párrafos cortos). Puedes usar emojis con moderación. '
-      'Si te preguntan algo ajeno al deporte, la nutrición o la salud, responde '
-      'amablemente que solo puedes ayudar con temas fitness y redirige la conversación.';
+
+  static String _buildSystemPrompt(bool isEnglish) => isEnglish
+      ? 'You are Horus, the virtual personal trainer of HorusAPP. '
+          'Your specialty is fitness, sports nutrition, weight training, '
+          'cardio, muscle recovery and health in general. '
+          'ALWAYS respond in English, with a friendly, motivating and direct tone. '
+          'Be concise (maximum 3-4 short paragraphs). You can use emojis in moderation. '
+          'If asked about something unrelated to sports, nutrition or health, politely explain '
+          'you can only help with fitness topics and redirect the conversation.'
+      : 'Eres Horus, el entrenador personal virtual de HorusAPP. '
+          'Tu especialidad es el fitness, la nutrición deportiva, el entrenamiento con pesas, '
+          'el cardio, la recuperación muscular y la salud en general. '
+          'Responde SIEMPRE en español, con un tono cercano, motivador y directo. '
+          'Sé conciso (máximo 3-4 párrafos cortos). Puedes usar emojis con moderación. '
+          'Si te preguntan algo ajeno al deporte, la nutrición o la salud, responde '
+          'amablemente que solo puedes ayudar con temas fitness y redirige la conversación.';
 
   /// Genera una respuesta usando Gemini. Recibe el mensaje actual y el historial
   /// de la conversación. Si la llamada falla, usa el sistema local de palabras
   /// clave como fallback.
   static Future<String> generateResponse(
     String userMessage,
-    List<Map<String, String>> history,
-  ) async {
+    List<Map<String, String>> history, {
+    bool isEnglish = false,
+  }) async {
+    final systemPrompt = _buildSystemPrompt(isEnglish);
     try {
       final contents = <Map<String, dynamic>>[];
       for (final msg in history) {
@@ -59,7 +69,7 @@ class ChatbotService {
             body: jsonEncode({
               'system_instruction': {
                 'parts': [
-                  {'text': _systemPrompt}
+                  {'text': systemPrompt}
                 ]
               },
               'contents': contents,
@@ -88,7 +98,7 @@ class ChatbotService {
               body: jsonEncode({
                 'system_instruction': {
                   'parts': [
-                    {'text': _systemPrompt}
+                    {'text': systemPrompt}
                   ]
                 },
                 'contents': contents,

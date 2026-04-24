@@ -16,15 +16,18 @@ class ExerciseCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final isLight = Theme.of(context).brightness == Brightness.light;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        color: isLight
+            ? colorScheme.surfaceContainerHighest
+            : const Color(0xFF252640),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: colorScheme.outline.withValues(alpha: 0.2),
+          color: colorScheme.outline.withValues(alpha: isLight ? 0.25 : 0.45),
         ),
       ),
       child: Row(
@@ -58,6 +61,7 @@ class ExerciseCard extends StatelessWidget {
                   exercise.name,
                   style: textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.w600,
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -68,17 +72,17 @@ class ExerciseCard extends StatelessWidget {
                     _ChipInfo(
                       icon: Icons.repeat,
                       label: '${exercise.sets} series',
-                      color: colorScheme.primary,
+                      color: Colors.green,
                     ),
                     _ChipInfo(
                       icon: Icons.fitness_center,
                       label: exercise.reps,
-                      color: colorScheme.secondary,
+                      color: Colors.blue,
                     ),
                     _ChipInfo(
                       icon: Icons.timer_outlined,
                       label: 'Descanso: ${exercise.rest}',
-                      color: Colors.teal,
+                      color: Colors.orange,
                     ),
                   ],
                 ),
@@ -89,7 +93,7 @@ class ExerciseCard extends StatelessWidget {
                       Icon(
                         Icons.info_outline,
                         size: 14,
-                        color: colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: colorScheme.onSurface.withValues(alpha: 0.65),
                       ),
                       const SizedBox(width: 4),
                       Expanded(
@@ -97,7 +101,7 @@ class ExerciseCard extends StatelessWidget {
                           exercise.notes,
                           style: textTheme.bodySmall?.copyWith(
                             color:
-                                colorScheme.onSurface.withValues(alpha: 0.7),
+                                colorScheme.onSurface.withValues(alpha: 0.75),
                             fontStyle: FontStyle.italic,
                           ),
                         ),
@@ -128,10 +132,13 @@ class _ChipInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    // Fondo más opaco en oscuro para que los chips destaquen
+    final bgColor = color.withValues(alpha: isLight ? 0.13 : 0.22);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
+        color: bgColor,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(

@@ -1,12 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
 import 'package:flutter/material.dart';
+import 'package:horus_app/core/l10n/app_l10n.dart';
 import 'package:horus_app/presentation/providers/auth_provider.dart';
 import 'package:horus_app/presentation/providers/chatbot_provider.dart';
+import 'package:horus_app/presentation/providers/locale_provider.dart';
 import 'package:horus_app/presentation/providers/routine_provider.dart';
 import 'package:horus_app/presentation/providers/theme_provider.dart';
 import 'package:horus_app/presentation/providers/user_provider.dart';
 import 'package:horus_app/presentation/widgets/custom_drawer.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Pantalla de opciones/configuración
 class OptionsScreen extends StatelessWidget {
@@ -15,19 +18,30 @@ class OptionsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
+    final localeProvider = context.watch<LocaleProvider>();
+    final l10n = AppL10n.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Opciones')),
+      appBar: AppBar(
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset('iconos/Icono_Opciones.png', width: 28, height: 28),
+            const SizedBox(width: 10),
+            Text(l10n.settings),
+          ],
+        ),
+      ),
       drawer: const CustomDrawer(),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           // ── Apariencia ─────────────────────────────────────────────────
-          _SectionHeader(title: 'Apariencia', icon: Icons.palette_outlined),
+          _SectionHeader(title: l10n.appearance, icon: Icons.palette_outlined),
           Card(
             child: Column(
               children: ThemeMode.values.map((mode) {
-                final label = _themeModeLabel(mode);
+                final label = _themeModeLabel(mode, l10n);
                 final icon = _themeModeIcon(mode);
                 final isSelected = themeProvider.themeMode == mode;
 
@@ -47,20 +61,51 @@ class OptionsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
+          // ── Idioma ──────────────────────────────────────────────────
+          _SectionHeader(title: l10n.language, icon: Icons.language),
+          Card(
+            child: Column(
+              children: [
+                RadioListTile<Locale>(
+                  value: const Locale('es', 'ES'),
+                  groupValue: localeProvider.locale,
+                  title: Text(l10n.spanish),
+                  secondary: const Text('🇪🇸', style: TextStyle(fontSize: 20)),
+                  onChanged: (v) {
+                    if (v != null) localeProvider.setLocale(v);
+                  },
+                  activeColor: Theme.of(context).colorScheme.primary,
+                  selected: localeProvider.locale.languageCode == 'es',
+                ),
+                RadioListTile<Locale>(
+                  value: const Locale('en', 'GB'),
+                  groupValue: localeProvider.locale,
+                  title: Text(l10n.english),
+                  secondary: const Text('🇬🇧', style: TextStyle(fontSize: 20)),
+                  onChanged: (v) {
+                    if (v != null) localeProvider.setLocale(v);
+                  },
+                  activeColor: Theme.of(context).colorScheme.primary,
+                  selected: localeProvider.locale.languageCode == 'en',
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+
           // ── Rutina ─────────────────────────────────────────────────────
-          _SectionHeader(title: 'Rutina', icon: Icons.fitness_center),
+          _SectionHeader(title: l10n.routineSection, icon: Icons.fitness_center),
           Card(
             child: Column(
               children: [
                 ListTile(
                   leading: const Icon(Icons.delete_outline,
                       color: Colors.orange),
-                  title: const Text('Eliminar rutina actual'),
-                  subtitle: const Text(
-                      'Podrás generar una nueva rutina cuando quieras'),
+                  title: Text(l10n.deleteRoutine),
+                  subtitle: Text(l10n.deleteRoutineSubtitle),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () =>
-                      _showDeleteRoutineDialog(context),
+                      _showDeleteRoutineDialog(context, l10n),
                 ),
               ],
             ),
@@ -68,31 +113,31 @@ class OptionsScreen extends StatelessWidget {
           const SizedBox(height: 24),
 
           // ── Cuenta ─────────────────────────────────────────────────────
-          _SectionHeader(title: 'Cuenta', icon: Icons.person_outline),
+          _SectionHeader(title: l10n.accountSection, icon: Icons.person_outline),
           Card(
             child: Column(
               children: [
                 ListTile(
                   leading: const Icon(Icons.logout, color: Colors.blue),
-                  title: const Text('Cerrar sesión'),
+                  title: Text(l10n.logout),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _showLogoutDialog(context),
+                  onTap: () => _showLogoutDialog(context, l10n),
                 ),
                 const Divider(height: 1, indent: 16),
                 ListTile(
                   leading: const Icon(Icons.delete_forever,
                       color: Colors.red),
-                  title: const Text(
-                    'Eliminar cuenta',
-                    style: TextStyle(color: Colors.red),
+                  title: Text(
+                    l10n.deleteAccount,
+                    style: const TextStyle(color: Colors.red),
                   ),
-                  subtitle: const Text(
-                    'Esta acción es permanente e irreversible',
-                    style: TextStyle(fontSize: 12),
+                  subtitle: Text(
+                    l10n.deleteAccountSubtitle,
+                    style: const TextStyle(fontSize: 12),
                   ),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () =>
-                      _showDeleteAccountDialog(context),
+                      _showDeleteAccountDialog(context, l10n),
                 ),
               ],
             ),
@@ -100,21 +145,31 @@ class OptionsScreen extends StatelessWidget {
           const SizedBox(height: 24),
 
           // ── Acerca de ─────────────────────────────────────────────────
-          _SectionHeader(title: 'Acerca de', icon: Icons.info_outline),
+          _SectionHeader(title: l10n.about, icon: Icons.info_outline),
           Card(
             child: Column(
               children: [
-                _InfoTile(
-                    title: 'HorusAPP',
-                    value: 'v1.0.0'),
+                _InfoTile(title: l10n.appNameLabel, value: 'HorusAPP v1.0.0'),
                 const Divider(height: 1, indent: 16),
-                _InfoTile(
-                    title: 'Desarrollado con',
-                    value: 'Flutter + Firebase'),
+                _InfoTile(title: l10n.developer, value: 'Rufito'),
                 const Divider(height: 1, indent: 16),
-                _InfoTile(
-                    title: 'Arquitectura',
-                    value: 'Clean Architecture'),
+                _InfoTile(title: l10n.project, value: 'TFG — Grado Superior DAM'),
+                const Divider(height: 1, indent: 16),
+                _InfoTile(title: l10n.technologies, value: 'Flutter · Firebase · Gemini AI'),
+                const Divider(height: 1, indent: 16),
+                _InfoTile(title: l10n.architecture, value: 'Clean Architecture · Provider'),
+                const Divider(height: 1, indent: 16),
+                ListTile(
+                  leading: const Icon(Icons.code),
+                  title: Text(l10n.sourceCode),
+                  subtitle: const Text('github.com/MARIO-24/Horus_app',
+                      style: TextStyle(fontSize: 12)),
+                  trailing: const Icon(Icons.open_in_new, size: 18),
+                  onTap: () => launchUrl(
+                    Uri.parse('https://github.com/MARIO-24/Horus_app'),
+                    mode: LaunchMode.externalApplication,
+                  ),
+                ),
               ],
             ),
           ),
@@ -123,14 +178,14 @@ class OptionsScreen extends StatelessWidget {
     );
   }
 
-  String _themeModeLabel(ThemeMode mode) {
+  String _themeModeLabel(ThemeMode mode, AppL10n l10n) {
     switch (mode) {
       case ThemeMode.light:
-        return 'Claro';
+        return l10n.themeLight;
       case ThemeMode.dark:
-        return 'Oscuro';
+        return l10n.themeDark;
       case ThemeMode.system:
-        return 'Sistema (por defecto)';
+        return l10n.themeSystem;
     }
   }
 
@@ -145,23 +200,22 @@ class OptionsScreen extends StatelessWidget {
     }
   }
 
-  void _showDeleteRoutineDialog(BuildContext context) {
+  void _showDeleteRoutineDialog(BuildContext context, AppL10n l10n) {
     final routineProvider = context.read<RoutineProvider>();
     if (!routineProvider.hasRoutine) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('No tienes ninguna rutina activa')));
+          .showSnackBar(SnackBar(content: Text(l10n.noActiveRoutine)));
       return;
     }
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Eliminar rutina'),
-        content: const Text(
-            '¿Seguro que quieres eliminar tu rutina actual? Podrás crear una nueva cuando quieras.'),
+        title: Text(l10n.deleteRoutineTitle),
+        content: Text(l10n.deleteRoutineBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.orange),
@@ -171,30 +225,30 @@ class OptionsScreen extends StatelessWidget {
               await routineProvider.deleteRoutine(uid);
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Rutina eliminada'),
+                  SnackBar(
+                    content: Text(l10n.routineDeleted),
                     behavior: SnackBarBehavior.floating,
                   ),
                 );
               }
             },
-            child: const Text('Eliminar'),
+            child: Text(l10n.deleteConfirm),
           ),
         ],
       ),
     );
   }
 
-  void _showLogoutDialog(BuildContext context) {
+  void _showLogoutDialog(BuildContext context, AppL10n l10n) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Cerrar sesión'),
-        content: const Text('¿Seguro que quieres cerrar sesión?'),
+        title: Text(l10n.logoutTitle),
+        content: Text(l10n.logoutBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () async {
@@ -204,14 +258,14 @@ class OptionsScreen extends StatelessWidget {
               context.read<UserProvider>().clear();
               context.read<ChatbotProvider>().clear();
             },
-            child: const Text('Cerrar sesión'),
+            child: Text(l10n.logoutConfirm),
           ),
         ],
       ),
     );
   }
 
-  void _showDeleteAccountDialog(BuildContext context) {
+  void _showDeleteAccountDialog(BuildContext context, AppL10n l10n) {
     final passwordCtrl = TextEditingController();
     bool obscure = true;
 
@@ -219,25 +273,23 @@ class OptionsScreen extends StatelessWidget {
       context: context,
       builder: (dialogCtx) => StatefulBuilder(
         builder: (dialogCtx, setDialogState) => AlertDialog(
-          title: const Text('Eliminar cuenta'),
+          title: Text(l10n.deleteAccountTitle),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                '⚠️ Esta acción es permanente. Se eliminarán tu cuenta y todos tus datos.',
-              ),
+              Text(l10n.deleteAccountWarning),
               const SizedBox(height: 16),
-              const Text(
-                'Introduce tu contraseña para confirmar:',
-                style: TextStyle(fontWeight: FontWeight.bold),
+              Text(
+                l10n.enterPasswordConfirm,
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: passwordCtrl,
                 obscureText: obscure,
                 decoration: InputDecoration(
-                  hintText: 'Contraseña',
+                  hintText: l10n.passwordHint,
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -252,7 +304,7 @@ class OptionsScreen extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogCtx),
-              child: const Text('Cancelar'),
+              child: Text(l10n.cancel),
             ),
             FilledButton(
               style: FilledButton.styleFrom(backgroundColor: Colors.red),
@@ -285,8 +337,8 @@ class OptionsScreen extends StatelessWidget {
                 } on FirebaseAuthException catch (e) {
                   final msg = e.code == 'wrong-password' ||
                           e.code == 'invalid-credential'
-                      ? 'Contraseña incorrecta'
-                      : 'Error al eliminar la cuenta: ${e.message}';
+                      ? l10n.wrongPassword
+                      : l10n.deleteAccountError(e.message ?? '');
                   messenger.showSnackBar(
                     SnackBar(
                       content: Text(msg),
@@ -296,20 +348,20 @@ class OptionsScreen extends StatelessWidget {
                 } catch (e) {
                   messenger.showSnackBar(
                     SnackBar(
-                      content: Text('Error inesperado: $e'),
+                      content: Text(l10n.unexpectedError(e.toString())),
                       backgroundColor: Colors.red,
                     ),
                   );
                 }
               },
-              child: const Text('Eliminar'),
+              child: Text(l10n.deleteConfirm),
             ),
           ],
         ),
       ),
     );
   }
-}
+} // end _OptionsScreenState
 
 /// Encabezado de sección
 class _SectionHeader extends StatelessWidget {
@@ -321,17 +373,19 @@ class _SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isLight = Theme.of(context).brightness == Brightness.light;
     return Padding(
       padding: const EdgeInsets.fromLTRB(4, 0, 0, 10),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: colorScheme.primary),
+          Icon(icon, size: 18,
+              color: isLight ? colorScheme.onSurface : colorScheme.primary),
           const SizedBox(width: 6),
           Text(
             title,
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: colorScheme.primary,
+                  color: isLight ? colorScheme.onSurface : colorScheme.primary,
                 ),
           ),
         ],

@@ -57,6 +57,7 @@ class RoutineProvider extends ChangeNotifier {
     required double weight,
     required double height,
     required DateTime birthDate,
+    bool isEnglish = false,
   }) async {
     _status = RoutineStatus.loading;
     notifyListeners();
@@ -68,6 +69,7 @@ class RoutineProvider extends ChangeNotifier {
         daysPerWeek: daysPerWeek,
         gender: gender,
         trainingLocation: trainingLocation,
+        isEnglish: isEnglish,
       );
 
       final routine = RoutineEntity(

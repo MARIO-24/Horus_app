@@ -5,6 +5,7 @@ import 'package:horus_app/core/theme/app_theme.dart';
 import 'package:horus_app/firebase_options.dart';
 import 'package:horus_app/presentation/providers/auth_provider.dart';
 import 'package:horus_app/presentation/providers/chatbot_provider.dart';
+import 'package:horus_app/presentation/providers/locale_provider.dart';
 import 'package:horus_app/presentation/providers/routine_provider.dart';
 import 'package:horus_app/presentation/providers/theme_provider.dart';
 import 'package:horus_app/presentation/providers/user_provider.dart';
@@ -27,13 +28,14 @@ class HorusApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => RoutineProvider()),
         ChangeNotifierProvider(create: (_) => ChatbotProvider()),
       ],
-      child: Consumer<ThemeProvider>(
-        builder: (context, themeProvider, _) {
+      child: Consumer2<ThemeProvider, LocaleProvider>(
+        builder: (context, themeProvider, localeProvider, _) {
           return MaterialApp.router(
             title: 'HorusAPP',
             debugShowCheckedModeBanner: false,
@@ -47,9 +49,9 @@ class HorusApp extends StatelessWidget {
             ],
             supportedLocales: const [
               Locale('es', 'ES'),
-              Locale('en', 'US'),
+              Locale('en', 'GB'),
             ],
-            locale: const Locale('es', 'ES'),
+            locale: localeProvider.locale,
             routerConfig: AppRouter.router,
           );
         },

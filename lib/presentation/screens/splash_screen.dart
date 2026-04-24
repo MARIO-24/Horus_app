@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:horus_app/core/constants/app_constants.dart';
+import 'package:horus_app/core/l10n/app_l10n.dart';
 import 'package:horus_app/presentation/providers/chatbot_provider.dart';
 import 'package:horus_app/presentation/providers/routine_provider.dart';
 import 'package:horus_app/presentation/providers/user_provider.dart';
@@ -24,16 +24,14 @@ class _SplashScreenState extends State<SplashScreen>
   late Animation<double> _fadeAnim;
   late Animation<double> _scaleAnim;
 
-  late final String _phrase;
+  // La frase se selecciona una vez al construirse el estado
+  late int _phraseIndex;
 
   @override
   void initState() {
     super.initState();
 
-    // Seleccionar frase aleatoria al iniciar
-    final random = Random();
-    _phrase = AppConstants.motivationalPhrases[
-        random.nextInt(AppConstants.motivationalPhrases.length)];
+    _phraseIndex = Random().nextInt(12); // 12 frases en AppL10n
 
     // Configurar animaciones de entrada
     _controller = AnimationController(
@@ -68,7 +66,6 @@ class _SplashScreenState extends State<SplashScreen>
     }
 
     if (mounted) {
-      // El router redirigirá a /home si hay sesión, o a /login si no
       context.go(AppRoutes.login);
     }
   }
@@ -81,6 +78,10 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Usar el idioma actual para la frase motivacional
+    final l10n = AppL10n.of(context);
+    final phrase = l10n.motivationalPhrases[_phraseIndex];
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -98,82 +99,28 @@ class _SplashScreenState extends State<SplashScreen>
             child: FadeTransition(
               opacity: _fadeAnim,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  // ── Logo ──────────────────────────────────────────────
                   ScaleTransition(
                     scale: _scaleAnim,
-                    child: Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.15),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.4),
-                          width: 2,
-                        ),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'H',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 64,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
+                    child: Image.asset(
+                      'iconos/Logo_HorusApp.png',
+                      width: 200,
+                      height: 200,
                     ),
                   ),
-                  const SizedBox(height: 24),
-
-                  // ── Nombre de la app ──────────────────────────────────
-                  const Text(
-                    AppConstants.appName,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 42,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 3,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    AppConstants.appTagline,
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.8),
-                      fontSize: 14,
-                      letterSpacing: 1,
-                    ),
-                  ),
-
-                  const SizedBox(height: 48),
-
-                  // ── Frase motivadora ──────────────────────────────────
+                  const SizedBox(height: 32),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: Text(
-                      '"$_phrase"',
+                      '"$phrase"',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.9),
-                        fontSize: 16,
+                        fontSize: 15,
                         fontStyle: FontStyle.italic,
                         height: 1.5,
                       ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 64),
-
-                  // ── Indicador de carga ───────────────────────────────
-                  SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 3,
-                      color: Colors.white.withValues(alpha: 0.7),
                     ),
                   ),
                 ],

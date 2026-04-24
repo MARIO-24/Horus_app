@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:horus_app/core/l10n/app_l10n.dart';
 import 'package:horus_app/presentation/providers/auth_provider.dart';
 import 'package:horus_app/presentation/providers/chatbot_provider.dart';
 import 'package:horus_app/presentation/providers/routine_provider.dart';
@@ -49,6 +50,7 @@ class _AccountScreenState extends State<AccountScreen> {
   Future<void> _showAvatarOptions() async {
     final userProvider = context.read<UserProvider>();
     final hasPhoto = userProvider.avatarUrl != null;
+    final l10n = AppL10n.readFrom(context);
     await showModalBottomSheet<void>(
       context: context,
       builder: (sheetCtx) => Column(
@@ -56,7 +58,7 @@ class _AccountScreenState extends State<AccountScreen> {
         children: [
           ListTile(
             leading: const Icon(Icons.photo_library),
-            title: const Text('Cambiar foto'),
+            title: Text(l10n.changePhoto),
             onTap: () async {
               Navigator.pop(sheetCtx);
               await _pickAvatar();
@@ -65,8 +67,8 @@ class _AccountScreenState extends State<AccountScreen> {
           if (hasPhoto)
             ListTile(
               leading: const Icon(Icons.delete, color: Colors.red),
-              title: const Text('Eliminar foto',
-                  style: TextStyle(color: Colors.red)),
+              title: Text(l10n.deletePhoto,
+                  style: const TextStyle(color: Colors.red)),
               onTap: () {
                 Navigator.pop(sheetCtx);
                 userProvider.removeAvatar();
@@ -74,7 +76,7 @@ class _AccountScreenState extends State<AccountScreen> {
             ),
           ListTile(
             leading: const Icon(Icons.close),
-            title: const Text('Cancelar'),
+            title: Text(l10n.cancel),
             onTap: () => Navigator.pop(sheetCtx),
           ),
         ],
@@ -86,30 +88,31 @@ class _AccountScreenState extends State<AccountScreen> {
 
   Future<void> _showEditNameDialog(String currentName) async {
     final ctrl = TextEditingController(text: currentName);
+    final l10n = AppL10n.readFrom(context);
     final result = await showDialog<String>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Editar nombre'),
+        title: Text(l10n.editName),
         content: TextField(
           controller: ctrl,
           autofocus: true,
           textCapitalization: TextCapitalization.words,
-          decoration: const InputDecoration(
-            labelText: 'Nombre',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: l10n.nameLabel,
+            border: const OutlineInputBorder(),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () {
               final trimmed = ctrl.text.trim();
               if (trimmed.isNotEmpty) Navigator.pop(context, trimmed);
             },
-            child: const Text('Guardar'),
+            child: Text(l10n.save),
           ),
         ],
       ),
@@ -119,7 +122,7 @@ class _AccountScreenState extends State<AccountScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(ok ? 'Nombre actualizado' : 'Error al guardar el nombre'),
+          content: Text(ok ? l10n.nameUpdated : l10n.nameUpdateError),
           backgroundColor: ok ? null : Colors.red.shade700,
           behavior: SnackBarBehavior.floating,
         ),
@@ -130,15 +133,16 @@ class _AccountScreenState extends State<AccountScreen> {
   // ── Diálogos de confirmación ─────────────────────────────────────────────
 
   void _showLogoutDialog() {
+    final l10n = AppL10n.readFrom(context);
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Cerrar sesión'),
-        content: const Text('¿Seguro que quieres cerrar sesión?'),
+        title: Text(l10n.logoutTitle),
+        content: Text(l10n.logoutBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () async {
@@ -149,7 +153,7 @@ class _AccountScreenState extends State<AccountScreen> {
               context.read<UserProvider>().clear();
               context.read<ChatbotProvider>().clear();
             },
-            child: const Text('Cerrar sesión'),
+            child: Text(l10n.logoutConfirm),
           ),
         ],
       ),
@@ -159,30 +163,29 @@ class _AccountScreenState extends State<AccountScreen> {
   void _showDeleteAccountDialog() {
     final passwordCtrl = TextEditingController();
     bool obscure = true;
+    final l10n = AppL10n.readFrom(context);
 
     showDialog(
       context: context,
       builder: (dialogCtx) => StatefulBuilder(
         builder: (dialogCtx, setDialogState) => AlertDialog(
-          title: const Text('Eliminar cuenta'),
+          title: Text(l10n.deleteAccountTitle),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                '⚠️ Esta acción es permanente. Se eliminarán tu cuenta y todos tus datos.',
-              ),
+              Text(l10n.deleteAccountWarning),
               const SizedBox(height: 16),
-              const Text(
-                'Introduce tu contraseña para confirmar:',
-                style: TextStyle(fontWeight: FontWeight.bold),
+              Text(
+                l10n.enterPasswordConfirm,
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: passwordCtrl,
                 obscureText: obscure,
                 decoration: InputDecoration(
-                  hintText: 'Contraseña',
+                  hintText: l10n.passwordHint,
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -197,7 +200,7 @@ class _AccountScreenState extends State<AccountScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogCtx),
-              child: const Text('Cancelar'),
+              child: Text(l10n.cancel),
             ),
             FilledButton(
               style: FilledButton.styleFrom(backgroundColor: Colors.red),
@@ -232,8 +235,8 @@ class _AccountScreenState extends State<AccountScreen> {
                 } on FirebaseAuthException catch (e) {
                   final msg = e.code == 'wrong-password' ||
                           e.code == 'invalid-credential'
-                      ? 'Contraseña incorrecta'
-                      : 'Error al eliminar la cuenta: ${e.message}';
+                      ? l10n.wrongPassword
+                      : l10n.deleteAccountError(e.message ?? '');
                   messenger.showSnackBar(
                     SnackBar(
                       content: Text(msg),
@@ -243,13 +246,13 @@ class _AccountScreenState extends State<AccountScreen> {
                 } catch (e) {
                   messenger.showSnackBar(
                     SnackBar(
-                      content: Text('Error inesperado: $e'),
+                      content: Text(l10n.unexpectedError('$e')),
                       backgroundColor: Colors.red,
                     ),
                   );
                 }
               },
-              child: const Text('Eliminar'),
+              child: Text(l10n.deleteConfirm),
             ),
           ],
         ),
@@ -268,6 +271,7 @@ class _AccountScreenState extends State<AccountScreen> {
     final isUploading = userProvider.isUploadingAvatar;
     final routineProvider = context.watch<RoutineProvider>();
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppL10n.of(context);
 
     final displayName = (user?.name.isNotEmpty == true)
         ? user!.name
@@ -276,7 +280,16 @@ class _AccountScreenState extends State<AccountScreen> {
             : 'Atleta');
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mi Cuenta')),
+      appBar: AppBar(
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset('iconos/Icono_Cuenta.png', width: 28, height: 28),
+            const SizedBox(width: 10),
+            Text(l10n.account),
+          ],
+        ),
+      ),
       drawer: const CustomDrawer(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -345,7 +358,7 @@ class _AccountScreenState extends State<AccountScreen> {
                         IconButton(
                           icon: Icon(Icons.edit,
                               size: 20, color: colorScheme.primary),
-                          tooltip: 'Editar nombre',
+                          tooltip: l10n.editName,
                           onPressed: () => _showEditNameDialog(displayName),
                         ),
                       ],
@@ -360,7 +373,12 @@ class _AccountScreenState extends State<AccountScreen> {
                     if (user?.createdAt != null) ...[
                       const SizedBox(height: 8),
                       Text(
-                        'Miembro desde ${DateFormat('MMMM yyyy', 'es').format(user!.createdAt)}',
+                        l10n.memberSince(
+                          DateFormat(
+                            'MMMM yyyy',
+                            l10n.isEnglish ? 'en' : 'es',
+                          ).format(user!.createdAt),
+                        ),
                         style: TextStyle(
                           fontSize: 12,
                           color: colorScheme.onSurface.withValues(alpha: 0.5),
@@ -387,7 +405,7 @@ class _AccountScreenState extends State<AccountScreen> {
                               color: colorScheme.primary),
                           const SizedBox(width: 8),
                           Text(
-                            'Rutina activa',
+                            l10n.activeRoutine,
                             style: Theme.of(context)
                                 .textTheme
                                 .titleMedium
@@ -397,24 +415,24 @@ class _AccountScreenState extends State<AccountScreen> {
                       ),
                       const Divider(height: 24),
                       _InfoRow(
-                          label: 'Objetivo',
+                          label: l10n.goalLabel,
                           value: routineProvider.routine!.goal),
                       _InfoRow(
-                          label: 'Nivel',
+                          label: l10n.levelLabel,
                           value: routineProvider.routine!.fitnessLevel),
                       _InfoRow(
-                          label: 'Dónde entrenas',
+                          label: l10n.whereYouTrain,
                           value: routineProvider.routine!.trainingLocation),
                       _InfoRow(
-                          label: 'Días/semana',
+                          label: l10n.daysWeekLabel,
                           value:
-                              '${routineProvider.routine!.daysPerWeek} días'),
+                              '${routineProvider.routine!.daysPerWeek} ${l10n.isEnglish ? 'days' : 'días'}'),
                       _InfoRow(
-                          label: 'Peso',
+                          label: l10n.weight,
                           value:
                               '${routineProvider.routine!.weight.toStringAsFixed(1)} kg'),
                       _InfoRow(
-                          label: 'Altura',
+                          label: l10n.height,
                           value:
                               '${routineProvider.routine!.height.toStringAsFixed(0)} cm'),
                     ],
@@ -432,7 +450,7 @@ class _AccountScreenState extends State<AccountScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'Acciones',
+                      l10n.actions,
                       style: Theme.of(context)
                           .textTheme
                           .titleMedium
@@ -443,14 +461,14 @@ class _AccountScreenState extends State<AccountScreen> {
                     FilledButton.icon(
                       onPressed: () => context.push(AppRoutes.routineForm),
                       icon: const Icon(Icons.auto_awesome),
-                      label: const Text('Generar nueva rutina'),
+                      label: Text(l10n.generateNewRoutine),
                     ),
                     const SizedBox(height: 10),
 
                     OutlinedButton.icon(
                       onPressed: _showLogoutDialog,
                       icon: const Icon(Icons.logout),
-                      label: const Text('Cerrar sesión'),
+                      label: Text(l10n.logout),
                     ),
                     const SizedBox(height: 10),
 
@@ -458,9 +476,9 @@ class _AccountScreenState extends State<AccountScreen> {
                       onPressed: _showDeleteAccountDialog,
                       icon: const Icon(Icons.delete_forever,
                           color: Colors.red),
-                      label: const Text(
-                        'Eliminar cuenta',
-                        style: TextStyle(color: Colors.red),
+                      label: Text(
+                        l10n.deleteAccount,
+                        style: const TextStyle(color: Colors.red),
                       ),
                     ),
                   ],

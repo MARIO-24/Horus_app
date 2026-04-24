@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:horus_app/core/l10n/app_l10n.dart';
 import 'package:horus_app/presentation/providers/chatbot_provider.dart';
 import 'package:horus_app/presentation/widgets/chat_bubble.dart';
 import 'package:horus_app/presentation/widgets/custom_drawer.dart';
@@ -31,7 +32,8 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     _inputCtrl.clear();
 
     final chatbotProvider = context.read<ChatbotProvider>();
-    await chatbotProvider.sendMessage(text);
+    final isEnglish = AppL10n.readFrom(context).isEnglish;
+    await chatbotProvider.sendMessage(text, isEnglish: isEnglish);
 
     // Scroll al último mensaje tras la respuesta
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -49,20 +51,18 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   Widget build(BuildContext context) {
     final chatbot = context.watch<ChatbotProvider>();
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppL10n.of(context);
 
     return Scaffold(
       appBar: AppBar(
         title: Row(
           children: [
-            CircleAvatar(
-              radius: 18,
-              backgroundColor: colorScheme.primary,
-              child: const Text(
-                'H',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+            ClipOval(
+              child: Image.asset(
+                'iconos/Icono_ChatBot.png',
+                width: 36,
+                height: 36,
+                fit: BoxFit.cover,
               ),
             ),
             const SizedBox(width: 10),
@@ -71,7 +71,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
               children: [
                 const Text('Horus Bot', style: TextStyle(fontSize: 16)),
                 Text(
-                  chatbot.isTyping ? 'Escribiendo...' : 'Entrenador virtual',
+                  chatbot.isTyping ? l10n.typing : l10n.virtualTrainer,
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.white.withValues(alpha: 0.8),
@@ -84,8 +84,8 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.delete_outline),
-            tooltip: 'Limpiar chat',
-            onPressed: () => _showClearDialog(context),
+            tooltip: l10n.clearChat,
+            onPressed: () => _showClearDialog(context, l10n),
           ),
         ],
       ),
@@ -141,7 +141,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                       focusNode: _focusNode,
                       textCapitalization: TextCapitalization.sentences,
                       decoration: InputDecoration(
-                        hintText: 'Pregunta algo sobre fitness...',
+                        hintText: l10n.messagePlaceholder,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(24),
                           borderSide: BorderSide.none,
@@ -178,23 +178,23 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     _send();
   }
 
-  void _showClearDialog(BuildContext context) {
+  void _showClearDialog(BuildContext context, AppL10n l10n) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Limpiar chat'),
-        content: const Text('¿Quieres borrar el historial de mensajes?'),
+        title: Text(l10n.clearChatTitle),
+        content: Text(l10n.clearChatBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () {
               Navigator.pop(context);
-              context.read<ChatbotProvider>().clearChat();
+              context.read<ChatbotProvider>().clearChat(isEnglish: l10n.isEnglish);
             },
-            child: const Text('Limpiar'),
+            child: Text(l10n.clearChatConfirm),
           ),
         ],
       ),
@@ -207,17 +207,9 @@ class _QuickSuggestions extends StatelessWidget {
   final void Function(String) onTap;
   const _QuickSuggestions({required this.onTap});
 
-  static const List<String> suggestions = [
-    '¿Qué debo comer antes de entrenar?',
-    'Dame motivación 💪',
-    '¿Cuánto descanso entre series?',
-    'Consejos para perder grasa',
-    '¿Para qué sirve la creatina?',
-    'Ejercicio para abdominales',
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final suggestions = AppL10n.of(context).quickSuggestions;
     return SizedBox(
       height: 42,
       child: ListView.builder(

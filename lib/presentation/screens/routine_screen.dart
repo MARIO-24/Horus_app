@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:horus_app/core/l10n/app_l10n.dart';
 import 'package:horus_app/domain/entities/routine_entity.dart';
 import 'package:horus_app/presentation/providers/routine_provider.dart';
 import 'package:horus_app/presentation/widgets/custom_drawer.dart';
@@ -15,6 +16,7 @@ class RoutineScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final routineProvider = context.watch<RoutineProvider>();
+    final l10n = AppL10n.of(context);
 
     if (routineProvider.isLoading) {
       return const Scaffold(
@@ -24,7 +26,16 @@ class RoutineScreen extends StatelessWidget {
 
     if (!routineProvider.hasRoutine) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Mi Rutina')),
+        appBar: AppBar(
+          title: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset('iconos/Icono_Rutina.png', width: 28, height: 28),
+              const SizedBox(width: 10),
+              Text(l10n.routine),
+            ],
+          ),
+        ),
         drawer: const CustomDrawer(),
         body: Center(
           child: Column(
@@ -48,7 +59,14 @@ class RoutineScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mi Rutina'),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset('iconos/Icono_Rutina.png', width: 28, height: 28),
+            const SizedBox(width: 10),
+            Text(l10n.routine),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -105,15 +123,18 @@ class _RoutineSummaryHeader extends StatelessWidget {
               Expanded(child: _HeaderStat(
                   label: 'Objetivo',
                   value: routine.goal,
-                  icon: Icons.flag)),
+                  icon: Icons.flag,
+                  iconColor: Colors.green)),
               Expanded(child: _HeaderStat(
                   label: 'Nivel',
                   value: routine.fitnessLevel,
-                  icon: Icons.trending_up)),
+                  icon: Icons.trending_up,
+                  iconColor: Colors.red)),
               Expanded(child: _HeaderStat(
                   label: 'Días',
                   value: '${routine.daysPerWeek}/sem',
-                  icon: Icons.calendar_today)),
+                  icon: Icons.calendar_today,
+                  iconColor: Colors.blue)),
             ],
           ),
           const SizedBox(height: 12),
@@ -147,18 +168,20 @@ class _HeaderStat extends StatelessWidget {
   final String label;
   final String value;
   final IconData icon;
+  final Color? iconColor;
 
   const _HeaderStat({
     required this.label,
     required this.value,
     required this.icon,
+    this.iconColor,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Icon(icon, color: Colors.white70, size: 18),
+        Icon(icon, color: iconColor ?? Colors.white70, size: 18),
         const SizedBox(height: 4),
         FittedBox(
           fit: BoxFit.scaleDown,
@@ -225,9 +248,10 @@ class _DayExpansionCard extends StatelessWidget {
           ),
           title: Text(
             day.dayName,
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 14,
+              color: colorScheme.onSurface,
             ),
           ),
           subtitle: Row(
@@ -253,14 +277,14 @@ class _DayExpansionCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: colorScheme.secondary.withValues(alpha: 0.12),
+                    color: colorScheme.primary.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
                     day.focus,
                     style: TextStyle(
                       fontSize: 11,
-                      color: colorScheme.secondary,
+                      color: colorScheme.primary,
                       fontWeight: FontWeight.w500,
                     ),
                     maxLines: 1,

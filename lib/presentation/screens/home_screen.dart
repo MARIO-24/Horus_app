@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:horus_app/core/l10n/app_l10n.dart';
 import 'package:horus_app/presentation/providers/auth_provider.dart';
 import 'package:horus_app/presentation/providers/routine_provider.dart';
 import 'package:horus_app/presentation/providers/user_provider.dart';
 import 'package:horus_app/presentation/widgets/custom_drawer.dart';
+import 'package:horus_app/presentation/widgets/user_avatar.dart';
 import 'package:horus_app/routes/app_router.dart';
 import 'package:provider/provider.dart';
 
@@ -21,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final routineProvider = context.watch<RoutineProvider>();
     final routine = routineProvider.routine;
+    final l10n = AppL10n.of(context);
     // Priorizar nombre de Firestore; si no está cargado aún, usar el de FirebaseAuth
     final firestoreName = context.watch<UserProvider>().user?.name;
     final authName = context.read<AuthProvider>().user?.name;
@@ -32,21 +35,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('HorusAPP'),
+        title: Text(l10n.appTitle),
         centerTitle: false,
         actions: [
           if (routine != null)
             IconButton(
               icon: const Icon(Icons.refresh),
-              tooltip: 'Nueva rutina',
+              tooltip: l10n.newRoutineTooltip,
               onPressed: () => context.push(AppRoutes.routineForm),
             ),
         ],
       ),
       drawer: const CustomDrawer(),
       body: routine == null
-          ? _NoRoutineBody(userName: userName)
-          : _RoutinePreviewBody(userName: userName, avatarUrl: avatarUrl),
+          ? _NoRoutineBody(userName: userName, l10n: l10n)
+          : _RoutinePreviewBody(userName: userName, avatarUrl: avatarUrl, l10n: l10n),
     );
   }
 }
@@ -54,11 +57,13 @@ class _HomeScreenState extends State<HomeScreen> {
 /// Cuerpo cuando el usuario NO tiene rutina generada
 class _NoRoutineBody extends StatelessWidget {
   final String userName;
-  const _NoRoutineBody({required this.userName});
+  final AppL10n l10n;
+  const _NoRoutineBody({required this.userName, required this.l10n});
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isLight = Theme.of(context).brightness == Brightness.light;
 
     return Center(
       child: SingleChildScrollView(
@@ -67,20 +72,22 @@ class _NoRoutineBody extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: colorScheme.primary.withValues(alpha: 0.1),
+                color: isLight
+                    ? const Color(0xFF1A1A2E).withValues(alpha: 0.18)
+                    : colorScheme.primary.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.fitness_center,
-                size: 72,
-                color: colorScheme.primary,
+              child: Image.asset(
+                'iconos/Icono_Rutina.png',
+                width: 80,
+                height: 80,
               ),
             ),
             const SizedBox(height: 28),
             Text(
-              '¡Hola, $userName! 👋',
+              l10n.greeting(userName),
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -88,7 +95,7 @@ class _NoRoutineBody extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              'Aún no tienes una rutina personalizada.\nVamos a crear una hecha justo para ti.',
+              l10n.noRoutineBody,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color:
                         colorScheme.onSurface.withValues(alpha: 0.7),
@@ -99,7 +106,7 @@ class _NoRoutineBody extends StatelessWidget {
             FilledButton.icon(
               onPressed: () => context.push(AppRoutes.routineForm),
               icon: const Icon(Icons.auto_awesome),
-              label: const Text('Generar mi rutina'),
+              label: Text(l10n.generateRoutine),
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 32, vertical: 16),
@@ -109,7 +116,7 @@ class _NoRoutineBody extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: () => context.go(AppRoutes.chatbot),
               icon: const Icon(Icons.chat_outlined),
-              label: const Text('Hablar con el bot'),
+              label: Text(l10n.talkWithBot),
             ),
           ],
         ),
@@ -122,7 +129,8 @@ class _NoRoutineBody extends StatelessWidget {
 class _RoutinePreviewBody extends StatelessWidget {
   final String userName;
   final String? avatarUrl;
-  const _RoutinePreviewBody({required this.userName, this.avatarUrl});
+  final AppL10n l10n;
+  const _RoutinePreviewBody({required this.userName, this.avatarUrl, required this.l10n});
 
   @override
   Widget build(BuildContext context) {
@@ -141,22 +149,10 @@ class _RoutinePreviewBody extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               child: Row(
                 children: [
-                  CircleAvatar(
+                  UserAvatar(
+                    avatarUrl: avatarUrl,
+                    displayName: userName,
                     radius: 28,
-                    backgroundColor: colorScheme.primary,
-                    backgroundImage: avatarUrl != null
-                        ? NetworkImage(avatarUrl!)
-                        : null,
-                    child: avatarUrl == null
-                        ? Text(
-                            userName.substring(0, 1).toUpperCase(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          )
-                        : null,
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -164,14 +160,14 @@ class _RoutinePreviewBody extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '¡Hola, $userName! 💪',
+                          l10n.greetingReady(userName),
                           style:
                               Theme.of(context).textTheme.titleLarge?.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),
                         ),
                         Text(
-                          'Tu rutina está lista',
+                          l10n.routineReady,
                           style:
                               Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: colorScheme.onSurface
@@ -193,27 +189,27 @@ class _RoutinePreviewBody extends StatelessWidget {
               Expanded(
                 child: _StatCard(
                   icon: Icons.flag_outlined,
-                  label: 'Objetivo',
+                  label: l10n.goalLabel,
                   value: routine.goal,
-                  color: colorScheme.primary,
+                  color: Colors.green,
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: _StatCard(
                   icon: Icons.trending_up,
-                  label: 'Nivel',
+                  label: l10n.levelLabel,
                   value: routine.fitnessLevel,
-                  color: colorScheme.secondary,
+                  color: Colors.red,
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: _StatCard(
                   icon: Icons.calendar_today_outlined,
-                  label: 'Días/semana',
+                  label: l10n.daysWeekLabel,
                   value: '${routine.daysPerWeek}',
-                  color: Colors.teal,
+                  color: Colors.blue,
                 ),
               ),
             ],
@@ -224,7 +220,7 @@ class _RoutinePreviewBody extends StatelessWidget {
           FilledButton.icon(
             onPressed: () => context.go(AppRoutes.routine),
             icon: const Icon(Icons.list_alt),
-            label: const Text('Ver rutina completa'),
+            label: Text(l10n.viewFullRoutine),
             style: FilledButton.styleFrom(
               minimumSize: const Size.fromHeight(52),
             ),
@@ -235,7 +231,7 @@ class _RoutinePreviewBody extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: () => context.push(AppRoutes.routineForm),
             icon: const Icon(Icons.auto_awesome),
-            label: const Text('Generar nueva rutina'),
+            label: Text(l10n.generateNewRoutine),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size.fromHeight(52),
             ),
@@ -244,7 +240,7 @@ class _RoutinePreviewBody extends StatelessWidget {
 
           // ── Preview de los días ────────────────────────────────────
           Text(
-            'Días de entrenamiento',
+            l10n.trainingDays,
             style: Theme.of(context)
                 .textTheme
                 .titleMedium
@@ -270,7 +266,7 @@ class _RoutinePreviewBody extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
                 subtitle: Text(
-                  '${day.exercises.length} ejercicios • ${day.focus}',
+                  '${l10n.exercisesCount(day.exercises.length)} • ${day.focus}',
                 ),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => context.go(AppRoutes.routine),
@@ -299,6 +295,7 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -311,7 +308,8 @@ class _StatCard extends StatelessWidget {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 13,
-                color: color,
+                // onSurface garantiza legibilidad en modo claro y oscuro
+                color: colorScheme.onSurface,
               ),
               textAlign: TextAlign.center,
               maxLines: 2,

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:horus_app/core/l10n/app_l10n.dart';
 import 'package:horus_app/presentation/providers/auth_provider.dart';
 import 'package:horus_app/presentation/providers/chatbot_provider.dart';
 import 'package:horus_app/presentation/providers/routine_provider.dart';
@@ -14,21 +15,21 @@ import 'package:provider/provider.dart';
 /// Ítem del menú lateral
 class _DrawerItem {
   final String label;
-  final IconData icon;
+  final String assetIcon;
   final String route;
 
   const _DrawerItem({
     required this.label,
-    required this.icon,
+    required this.assetIcon,
     required this.route,
   });
 }
 
 const List<_DrawerItem> _drawerItems = [
-  _DrawerItem(label: 'Rutina', icon: Icons.fitness_center, route: AppRoutes.home),
-  _DrawerItem(label: 'Cuenta', icon: Icons.person, route: AppRoutes.account),
-  _DrawerItem(label: 'ChatBot', icon: Icons.chat_bubble_outline, route: AppRoutes.chatbot),
-  _DrawerItem(label: 'Opciones', icon: Icons.settings, route: AppRoutes.options),
+  _DrawerItem(label: 'Rutina',   assetIcon: 'iconos/Icono_Rutina.png',   route: AppRoutes.home),
+  _DrawerItem(label: 'Cuenta',   assetIcon: 'iconos/Icono_Cuenta.png',   route: AppRoutes.account),
+  _DrawerItem(label: 'ChatBot',  assetIcon: 'iconos/Icono_ChatBot.png',  route: AppRoutes.chatbot),
+  _DrawerItem(label: 'Opciones', assetIcon: 'iconos/Icono_Opciones.png', route: AppRoutes.options),
 ];
 
 /// Drawer lateral reutilizable para la navegación principal de la app
@@ -61,7 +62,7 @@ class CustomDrawer extends StatelessWidget {
     }
   }
 
-  Future<void> _showAvatarOptions(BuildContext context) async {
+  Future<void> _showAvatarOptions(BuildContext context, AppL10n l10n) async {
     final userProvider = context.read<UserProvider>();
     final hasPhoto = userProvider.avatarUrl != null;
     await showModalBottomSheet<void>(
@@ -71,7 +72,7 @@ class CustomDrawer extends StatelessWidget {
         children: [
           ListTile(
             leading: const Icon(Icons.photo_library),
-            title: const Text('Cambiar foto'),
+            title: Text(l10n.changePhoto),
             onTap: () async {
               Navigator.pop(sheetCtx);
               await _pickAvatar(context);
@@ -80,8 +81,8 @@ class CustomDrawer extends StatelessWidget {
           if (hasPhoto)
             ListTile(
               leading: const Icon(Icons.delete, color: Colors.red),
-              title: const Text('Eliminar foto',
-                  style: TextStyle(color: Colors.red)),
+              title: Text(l10n.deletePhoto,
+                  style: const TextStyle(color: Colors.red)),
               onTap: () {
                 Navigator.pop(sheetCtx);
                 userProvider.removeAvatar();
@@ -89,7 +90,7 @@ class CustomDrawer extends StatelessWidget {
             ),
           ListTile(
             leading: const Icon(Icons.close),
-            title: const Text('Cancelar'),
+            title: Text(l10n.cancel),
             onTap: () => Navigator.pop(sheetCtx),
           ),
         ],
@@ -105,13 +106,20 @@ class CustomDrawer extends StatelessWidget {
     final user = userProvider.user;
     final authProvider = context.read<AuthProvider>();
     final routineProvider = context.read<RoutineProvider>();
+    final l10n = AppL10n.of(context);
+    final drawerLabels = [
+      l10n.navRoutine,
+      l10n.navAccount,
+      l10n.navChatBot,
+      l10n.navSettings,
+    ];
 
     // Nombre: priorizar Firestore, luego Firebase Auth displayName
     final displayName = (user?.name.isNotEmpty == true)
         ? user!.name
         : (authProvider.user?.name.isNotEmpty == true
             ? authProvider.user!.name
-            : 'Usuario');
+            : l10n.defaultUser);
 
     final avatarUrl = userProvider.avatarUrl;
     final isUploading = userProvider.isUploadingAvatar;
@@ -121,20 +129,27 @@ class CustomDrawer extends StatelessWidget {
         children: [
           // ── Cabecera del drawer ─────────────────────────────────────
           UserAccountsDrawerHeader(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [colorScheme.primary, colorScheme.secondary],
+                colors: [Color(0xFF0F0F1A), Color(0xFF1A1A2E)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
             ),
             accountName: Text(
               displayName,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: Color(0xFFC9A84C),
+              ),
             ),
-            accountEmail: Text(user?.email ?? authProvider.user?.email ?? ''),
+            accountEmail: Text(
+              user?.email ?? authProvider.user?.email ?? '',
+              style: const TextStyle(color: Colors.white70),
+            ),
             currentAccountPicture: GestureDetector(
-              onTap: () => _showAvatarOptions(context),
+              onTap: () => _showAvatarOptions(context, l10n),
               child: Stack(
                 children: [
                   UserAvatar(
@@ -186,21 +201,23 @@ class CustomDrawer extends StatelessWidget {
                         currentRoute == AppRoutes.home);
 
                 return ListTile(
-                  leading: Icon(
-                    item.icon,
-                    color: isSelected
-                        ? colorScheme.primary
-                        : colorScheme.onSurface.withValues(alpha: 0.7),
+                  leading: Image.asset(
+                    item.assetIcon,
+                    width: 30,
+                    height: 30,
+                    color: isSelected ? const Color(0xFFC9A84C) : null,
+                    colorBlendMode: BlendMode.srcIn,
                   ),
                   title: Text(
-                    item.label,
+                    drawerLabels[i],
                     style: TextStyle(
                       fontWeight: isSelected
                           ? FontWeight.bold
                           : FontWeight.normal,
+                      // Siempre claro: el fondo del drawer es oscuro en ambos temas
                       color: isSelected
                           ? colorScheme.primary
-                          : colorScheme.onSurface,
+                          : Colors.white70,
                     ),
                   ),
                   selected: isSelected,
@@ -223,9 +240,9 @@ class CustomDrawer extends StatelessWidget {
           // ── Botón cerrar sesión ─────────────────────────────────────
           ListTile(
             leading: const Icon(Icons.logout, color: Colors.red),
-            title: const Text(
-              'Cerrar sesión',
-              style: TextStyle(color: Colors.red),
+            title: Text(
+              l10n.logout,
+              style: const TextStyle(color: Colors.red),
             ),
             onTap: () async {
               Navigator.pop(context);
