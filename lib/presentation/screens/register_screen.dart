@@ -54,6 +54,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final authProvider = context.read<AuthProvider>();
     final userProvider = context.read<UserProvider>();
     final routineProvider = context.read<RoutineProvider>();
+    final chatbotProvider = context.read<ChatbotProvider>();
     final avatarFile = _avatarFile;
 
     final success = await authProvider.register(
@@ -62,12 +63,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       password: _passwordCtrl.text,
     );
 
-    // NO comprobar mounted aquí — las operaciones de datos no necesitan
-    // el widget montado y el router puede haberlo desmontado ya
     if (success) {
       final uid = authProvider.user!.uid;
-      // Capturar chatbotProvider ANTES del primer await
-      final chatbotProvider = context.read<ChatbotProvider>();
 
       await userProvider.loadUser(uid);
       await routineProvider.loadRoutine(uid);
