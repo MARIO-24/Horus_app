@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "981139482230",
+    "project_id": "horusapp-d4976",
+    "storage_bucket": "horusapp-d4976.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:981139482230:android:0befbb94de5bdae8952157",
+        "android_client_info": {
+          "package_name": "com.horusapp.horus_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAcWMwCILI3za2x3h9RNcikwkg2LPUWtiw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

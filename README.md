@@ -1,0 +1,203 @@
+<div align="center">
+
+# 🏛️ HorusAPP
+
+**Tu entrenador personal inteligente — Trabajo de Fin de Grado**
+
+[![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart)](https://dart.dev)
+[![Firebase](https://img.shields.io/badge/Firebase-FFCA28?logo=firebase&logoColor=black)](https://firebase.google.com)
+[![Gemini AI](https://img.shields.io/badge/Gemini_AI-8E75B2?logo=google&logoColor=white)](https://ai.google.dev)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+
+</div>
+
+---
+
+## 📱 Descripción
+
+**HorusAPP** es una aplicación móvil de fitness desarrollada con Flutter como Trabajo de Fin de Grado. Combina inteligencia artificial (Google Gemini 2.5 Flash Lite) con Firebase para ofrecer a cada usuario una experiencia de entrenamiento completamente personalizada: rutinas generadas por IA adaptadas a su perfil, un chatbot entrenador personal disponible 24/7 y seguimiento completo del progreso.
+
+---
+
+## ✨ Funcionalidades principales
+
+| Módulo | Descripción |
+|--------|-------------|
+| 🔐 **Autenticación** | Registro e inicio de sesión con Firebase Auth (email/contraseña) |
+| 👤 **Perfil de usuario** | Datos personales, foto de perfil con caché, edición de nombre |
+| 🤖 **Chatbot IA** | Entrenador virtual con Google Gemini + fallback local por palabras clave |
+| 🏋️ **Rutinas IA** | Generación personalizada de rutinas con Gemini, con descripciones por ejercicio |
+| 📊 **Historial de chat** | Conversaciones persistidas por usuario en Firestore |
+| 🌗 **Tema claro/oscuro** | Soporte completo de tema dinámico con Material 3 |
+| 🗑️ **Gestión de cuenta** | Eliminación de cuenta con borrado completo de datos (Firestore + Storage) |
+
+---
+
+## 🏗️ Arquitectura
+
+El proyecto sigue **Clean Architecture** con separación estricta en capas:
+
+```
+lib/
+├── core/               # Constantes, tema, utilidades
+├── data/
+│   ├── datasources/    # Firebase Auth, Firestore, Storage
+│   ├── models/         # Modelos de datos (UserModel, etc.)
+│   └── repositories/   # Implementaciones de repositorios
+├── domain/
+│   ├── entities/       # Entidades de negocio (UserEntity, RoutineEntity...)
+│   ├── repositories/   # Contratos/interfaces
+│   └── usecases/       # Casos de uso
+├── presentation/
+│   ├── providers/      # Estado con ChangeNotifier (Provider)
+│   ├── screens/        # Pantallas (Login, Home, Rutina, Chatbot, Cuenta...)
+│   └── widgets/        # Componentes reutilizables
+├── routes/             # Navegación con GoRouter
+└── services/           # ChatbotService, RoutineGeneratorService (Gemini API)
+```
+
+---
+
+## 🤖 Integración con IA
+
+### Chatbot — Horus
+- Motor principal: **Gemini 2.5 Flash Lite** via REST API
+- Historial de conversación: últimos 6 mensajes enviados a Gemini como contexto
+- Límite de tokens: 350 por respuesta (velocidad optimizada)
+- Fallback automático: sistema local de palabras clave si la API no está disponible
+- Persistencia: historial guardado en Firestore por `uid` de usuario
+
+### Generador de rutinas
+- Motor principal: **Gemini 2.5 Flash Lite** — genera JSON estructurado con ejercicios
+- Cada ejercicio incluye: nombre, series, repeticiones, descanso y **descripción de ejecución**
+- Fallback automático: banco de rutinas pre-diseñadas por objetivo y nivel
+- Parámetros: objetivo, nivel, días/semana, género, lugar de entrenamiento
+
+---
+
+## 🛠️ Stack tecnológico
+
+| Tecnología | Uso |
+|-----------|-----|
+| **Flutter 3** | Framework principal (Android/iOS) |
+| **Dart 3** | Lenguaje de programación |
+| **Firebase Auth** | Autenticación de usuarios |
+| **Cloud Firestore** | Base de datos en tiempo real |
+| **Firebase Storage** | Almacenamiento de fotos de perfil |
+| **Google Gemini 2.5 Flash Lite** | Motor de IA para chatbot y rutinas |
+| **Provider** | Gestión de estado (ChangeNotifier) |
+| **GoRouter** | Navegación declarativa |
+| **CachedNetworkImage** | Caché de imágenes en disco |
+| **HTTP** | Llamadas REST a la API de Gemini |
+
+---
+
+## 🚀 Instalación y ejecución
+
+### Requisitos previos
+- [Flutter SDK](https://docs.flutter.dev/get-started/install) ≥ 3.2.0
+- [Dart SDK](https://dart.dev/get-dart) ≥ 3.0.0
+- Android Studio o VS Code con extensión Flutter
+- Cuenta de Firebase con proyecto configurado
+- API Key de Google Gemini
+
+### 1. Clonar el repositorio
+```bash
+git clone https://github.com/MARIO-24/Horus_app.git
+cd Horus_app
+```
+
+### 2. Instalar dependencias
+```bash
+flutter pub get
+```
+
+### 3. Configurar Firebase
+- Crea un proyecto en [Firebase Console](https://console.firebase.google.com)
+- Activa: Authentication (email/password), Firestore, Storage
+- Descarga `google-services.json` y colócalo en `android/app/`
+- Ejecuta `flutterfire configure` para generar `lib/firebase_options.dart`
+
+### 4. Configurar Reglas de Firestore
+```js
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /routines/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /chats/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
+```
+
+### 5. Configurar API Key de Gemini
+Sustituye la clave en `lib/services/chatbot_service.dart` y `lib/services/routine_generator_service.dart`:
+```dart
+static const _apiKey = 'TU_API_KEY_AQUI';
+```
+Obtén tu clave gratuita en [Google AI Studio](https://aistudio.google.com/app/apikey).
+
+### 6. Ejecutar la app
+```bash
+flutter run
+```
+
+---
+
+## 📂 Estructura de Firestore
+
+```
+users/{uid}
+  ├── name: String
+  ├── email: String
+  ├── avatarUrl: String?
+  ├── weight: double
+  ├── height: double
+  ├── birthDate: Timestamp
+  └── ...
+
+routines/{uid}
+  ├── goal: String
+  ├── fitnessLevel: String
+  ├── daysPerWeek: int
+  ├── days: Array<WorkoutDay>
+  └── createdAt: Timestamp
+
+chats/{uid}
+  └── messages: Array<{text, isUser, timestamp}>
+```
+
+---
+
+## 📸 Capturas de pantalla
+
+> *Próximamente*
+
+---
+
+## 👨‍💻 Autor
+
+**Mario** — Trabajo de Fin de Grado  
+Grado en Ingeniería Informática
+
+---
+
+## 📄 Licencia
+
+Este proyecto está bajo la licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
+
+
+- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
+- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.
