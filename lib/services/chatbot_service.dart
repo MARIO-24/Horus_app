@@ -13,7 +13,7 @@ class ChatbotService {
   static final Random _random = Random();
 
   // ── Gemini API ────────────────────────────────────────────────────────────
-  static const _apiKey = 'AIzaSyDe3cMX6FPSar6ucmMWqbMZ0HjN8SfyvtM';
+  static const _apiKey = String.fromEnvironment('GEMINI_API_KEY');
   static const _endpoint =
       'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent';
 

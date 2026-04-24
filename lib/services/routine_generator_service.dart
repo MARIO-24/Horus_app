@@ -1,19 +1,19 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:horus_app/domain/entities/routine_entity.dart';
 import 'package:http/http.dart' as http;
 
-/// Servicio de generación de rutinas.
+/// Servicio de generaciÃ³n de rutinas.
 /// Usa Gemini como motor principal con fallback local si la API falla.
 class RoutineGeneratorService {
   RoutineGeneratorService._();
 
-  static const _apiKey = 'AIzaSyDe3cMX6FPSar6ucmMWqbMZ0HjN8SfyvtM';
+  static const _apiKey = String.fromEnvironment('GEMINI_API_KEY');
   static const _endpoint =
       'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent';
 
-  /// Genera una rutina con Gemini. Si la API falla, usa la generación local.
+  /// Genera una rutina con Gemini. Si la API falla, usa la generaciÃ³n local.
   static Future<List<WorkoutDayEntity>> generateRoutineWithAI({
     required String goal,
     required String fitnessLevel,
@@ -33,7 +33,7 @@ class RoutineGeneratorService {
               '- Training location: $trainingLocation\n\n'
               'Return ONLY a JSON array with exactly $daysPerWeek days. '
               'Each day must follow this exact format:\n'
-              '[{"dayNumber":1,"dayName":"Day 1 — Name","focus":"Muscle group",'
+              '[{"dayNumber":1,"dayName":"Day 1 â€” Name","focus":"Muscle group",'
               '"exercises":[{"name":"Exercise","sets":3,"reps":"12","rest":"60s",'
               '"notes":"Brief description of how to perform the exercise correctly"}]}]\n\n'
               'The "notes" field is MANDATORY for each exercise: include a concise description '
@@ -45,23 +45,23 @@ class RoutineGeneratorService {
               'Perfil del usuario:\n'
               '- Objetivo: $goal\n'
               '- Nivel: $fitnessLevel\n'
-              '- Días por semana: $daysPerWeek\n'
-              '- Género: $gender\n'
+              '- DÃ­as por semana: $daysPerWeek\n'
+              '- GÃ©nero: $gender\n'
               '- Lugar de entrenamiento: $trainingLocation\n\n'
-              'Devuelve ÚNICAMENTE un array JSON con exactamente $daysPerWeek días. '
-              'Cada día debe tener este formato exacto:\n'
-              '[{"dayNumber":1,"dayName":"Día 1 — Nombre","focus":"Grupo muscular",'
+              'Devuelve ÃšNICAMENTE un array JSON con exactamente $daysPerWeek dÃ­as. '
+              'Cada dÃ­a debe tener este formato exacto:\n'
+              '[{"dayNumber":1,"dayName":"DÃ­a 1 â€” Nombre","focus":"Grupo muscular",'
               '"exercises":[{"name":"Ejercicio","sets":3,"reps":"12","rest":"60s",'
-              '"notes":"Descripción breve de cómo ejecutar el ejercicio correctamente"}]}]\n\n'
-              'El campo "notes" es OBLIGATORIO en cada ejercicio: incluye una descripción '
-              'concisa (1-2 frases) sobre cómo realizar el ejercicio correctamente, '
-              'qué músculos trabaja y algún consejo clave de ejecución.\n'
-              'Cada día debe tener entre 4 y 7 ejercicios. Adapta al nivel y lugar. '
+              '"notes":"DescripciÃ³n breve de cÃ³mo ejecutar el ejercicio correctamente"}]}]\n\n'
+              'El campo "notes" es OBLIGATORIO en cada ejercicio: incluye una descripciÃ³n '
+              'concisa (1-2 frases) sobre cÃ³mo realizar el ejercicio correctamente, '
+              'quÃ© mÃºsculos trabaja y algÃºn consejo clave de ejecuciÃ³n.\n'
+              'Cada dÃ­a debe tener entre 4 y 7 ejercicios. Adapta al nivel y lugar. '
               'Responde SOLO con el JSON, sin texto ni bloques markdown.';
 
       final systemInstruction = isEnglish
           ? 'You are an expert personal trainer. You generate workout routines in valid JSON, without additional text.'
-          : 'Eres un entrenador personal experto. Generas rutinas de entrenamiento en JSON válido, sin texto adicional.';
+          : 'Eres un entrenador personal experto. Generas rutinas de entrenamiento en JSON vÃ¡lido, sin texto adicional.';
 
       final response = await http
           .post(
@@ -93,7 +93,7 @@ class RoutineGeneratorService {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         final candidate = data['candidates'][0] as Map<String, dynamic>;
 
-        // Detectar truncado por límite de tokens
+        // Detectar truncado por lÃ­mite de tokens
         final finishReason = candidate['finishReason'] as String? ?? '';
         if (finishReason == 'MAX_TOKENS') {
           debugPrint('[RoutineGeneratorService] Respuesta truncada (MAX_TOKENS), usando fallback local');
@@ -116,7 +116,7 @@ class RoutineGeneratorService {
         final days = rawDays
             .map((d) => WorkoutDayEntity.fromMap(d as Map<String, dynamic>))
             .toList();
-        debugPrint('[RoutineGeneratorService] Rutina generada con Gemini ✓');
+        debugPrint('[RoutineGeneratorService] Rutina generada con Gemini âœ“');
         return days;
       }
 
@@ -142,7 +142,7 @@ class RoutineGeneratorService {
     }
   }
 
-  /// Genera una rutina completa según el perfil del usuario (local, sin IA)
+  /// Genera una rutina completa segÃºn el perfil del usuario (local, sin IA)
   static List<WorkoutDayEntity> generateRoutine({
     required String goal,
     required String fitnessLevel,
@@ -157,13 +157,13 @@ class RoutineGeneratorService {
       case 'Bajar peso':
         days = _weightLossRoutine(fitnessLevel, daysPerWeek);
         break;
-      case 'Ganar músculo':
+      case 'Ganar mÃºsculo':
         days = _muscleGainRoutine(fitnessLevel, daysPerWeek);
         break;
       case 'Resistencia':
         days = _enduranceRoutine(fitnessLevel, daysPerWeek);
         break;
-      case 'Rehabilitación':
+      case 'RehabilitaciÃ³n':
         days = _rehabilitationRoutine(fitnessLevel, daysPerWeek);
         break;
       default:
@@ -172,9 +172,9 @@ class RoutineGeneratorService {
     return noEquipment ? _substituteEquipment(days) : days;
   }
 
-  // ══════════════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   // BAJAR PESO
-  // ══════════════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
   static List<WorkoutDayEntity> _weightLossRoutine(
       String level, int days) {
@@ -187,19 +187,19 @@ class RoutineGeneratorService {
     final allDays = [
       WorkoutDayEntity(
         dayNumber: 1,
-        dayName: 'Día 1 — Cuerpo Completo A',
+        dayName: 'DÃ­a 1 â€” Cuerpo Completo A',
         focus: 'Fuerza general',
         exercises: [
           const ExerciseEntity(name: 'Sentadilla con peso corporal', sets: 3, reps: '15', rest: '60s'),
           const ExerciseEntity(name: 'Flexiones de brazos', sets: 3, reps: '10', rest: '60s', notes: 'Modificadas si es necesario'),
           const ExerciseEntity(name: 'Remo con mancuerna', sets: 3, reps: '12', rest: '60s'),
-          const ExerciseEntity(name: 'Puente de glúteos', sets: 3, reps: '15', rest: '45s'),
+          const ExerciseEntity(name: 'Puente de glÃºteos', sets: 3, reps: '15', rest: '45s'),
           const ExerciseEntity(name: 'Plancha abdominal', sets: 3, reps: '30s', rest: '45s'),
         ],
       ),
       WorkoutDayEntity(
         dayNumber: 2,
-        dayName: 'Día 2 — Cardio HIIT',
+        dayName: 'DÃ­a 2 â€” Cardio HIIT',
         focus: 'Quema de grasa',
         exercises: [
           const ExerciseEntity(name: 'Jumping Jacks', sets: 3, reps: '45s', rest: '15s'),
@@ -212,47 +212,47 @@ class RoutineGeneratorService {
       ),
       WorkoutDayEntity(
         dayNumber: 3,
-        dayName: 'Día 3 — Cuerpo Completo B',
+        dayName: 'DÃ­a 3 â€” Cuerpo Completo B',
         focus: 'Circuito funcional',
         exercises: [
           const ExerciseEntity(name: 'Zancadas alternas', sets: 3, reps: '12 c/pierna', rest: '60s'),
           const ExerciseEntity(name: 'Press de pecho con mancuernas', sets: 3, reps: '12', rest: '60s'),
-          const ExerciseEntity(name: 'Jalón al pecho (polea)', sets: 3, reps: '12', rest: '60s'),
-          const ExerciseEntity(name: 'Curl de bíceps', sets: 3, reps: '12', rest: '45s'),
-          const ExerciseEntity(name: 'Extensión de tríceps', sets: 3, reps: '12', rest: '45s'),
+          const ExerciseEntity(name: 'JalÃ³n al pecho (polea)', sets: 3, reps: '12', rest: '60s'),
+          const ExerciseEntity(name: 'Curl de bÃ­ceps', sets: 3, reps: '12', rest: '45s'),
+          const ExerciseEntity(name: 'ExtensiÃ³n de trÃ­ceps', sets: 3, reps: '12', rest: '45s'),
           const ExerciseEntity(name: 'Crunches abdominales', sets: 3, reps: '20', rest: '30s'),
         ],
       ),
       WorkoutDayEntity(
         dayNumber: 4,
-        dayName: 'Día 4 — Cardio Moderado + Core',
+        dayName: 'DÃ­a 4 â€” Cardio Moderado + Core',
         focus: 'Resistencia y abdomen',
         exercises: [
-          const ExerciseEntity(name: 'Caminata rápida / Bici estática', sets: 1, reps: '30 min', rest: '—', notes: 'Zona 2, ritmo moderado'),
+          const ExerciseEntity(name: 'Caminata rÃ¡pida / Bici estÃ¡tica', sets: 1, reps: '30 min', rest: 'â€”', notes: 'Zona 2, ritmo moderado'),
           const ExerciseEntity(name: 'Plancha lateral', sets: 3, reps: '30s c/lado', rest: '30s'),
           const ExerciseEntity(name: 'Bicicleta abdominal', sets: 3, reps: '20', rest: '30s'),
-          const ExerciseEntity(name: 'Elevación de piernas', sets: 3, reps: '15', rest: '30s'),
+          const ExerciseEntity(name: 'ElevaciÃ³n de piernas', sets: 3, reps: '15', rest: '30s'),
         ],
       ),
       WorkoutDayEntity(
         dayNumber: 5,
-        dayName: 'Día 5 — Tren Inferior + HIIT',
+        dayName: 'DÃ­a 5 â€” Tren Inferior + HIIT',
         focus: 'Piernas y cardio',
         exercises: [
           const ExerciseEntity(name: 'Sentadilla goblet', sets: 3, reps: '15', rest: '60s'),
           const ExerciseEntity(name: 'Peso muerto rumano', sets: 3, reps: '12', rest: '60s'),
           const ExerciseEntity(name: 'Hip Thrust', sets: 3, reps: '15', rest: '60s'),
-          const ExerciseEntity(name: 'Saltos al cajón', sets: 3, reps: '10', rest: '60s'),
-          const ExerciseEntity(name: 'Sprint intervalado', sets: 6, reps: '20s sprint / 40s caminar', rest: '—'),
+          const ExerciseEntity(name: 'Saltos al cajÃ³n', sets: 3, reps: '10', rest: '60s'),
+          const ExerciseEntity(name: 'Sprint intervalado', sets: 6, reps: '20s sprint / 40s caminar', rest: 'â€”'),
         ],
       ),
       WorkoutDayEntity(
         dayNumber: 6,
-        dayName: 'Día 6 — Cardio + Movilidad',
-        focus: 'Actividad activa de recuperación',
+        dayName: 'DÃ­a 6 â€” Cardio + Movilidad',
+        focus: 'Actividad activa de recuperaciÃ³n',
         exercises: [
-          const ExerciseEntity(name: 'Trote suave', sets: 1, reps: '20 min', rest: '—'),
-          const ExerciseEntity(name: 'Estiramiento de cuádriceps', sets: 2, reps: '30s c/lado', rest: '10s'),
+          const ExerciseEntity(name: 'Trote suave', sets: 1, reps: '20 min', rest: 'â€”'),
+          const ExerciseEntity(name: 'Estiramiento de cuÃ¡driceps', sets: 2, reps: '30s c/lado', rest: '10s'),
           const ExerciseEntity(name: 'Estiramiento de isquiotibiales', sets: 2, reps: '30s c/lado', rest: '10s'),
           const ExerciseEntity(name: 'Estiramiento de pecho', sets: 2, reps: '30s', rest: '10s'),
           const ExerciseEntity(name: 'Cat-Cow (movilidad lumbar)', sets: 2, reps: '10', rest: '20s'),
@@ -267,8 +267,8 @@ class RoutineGeneratorService {
     final allDays = [
       WorkoutDayEntity(
         dayNumber: 1,
-        dayName: 'Día 1 — Tren Superior (Empuje)',
-        focus: 'Pecho · Hombro · Tríceps',
+        dayName: 'DÃ­a 1 â€” Tren Superior (Empuje)',
+        focus: 'Pecho Â· Hombro Â· TrÃ­ceps',
         exercises: [
           const ExerciseEntity(name: 'Press de banca con barra', sets: 4, reps: '12', rest: '75s'),
           const ExerciseEntity(name: 'Press de hombro con mancuernas', sets: 3, reps: '12', rest: '75s'),
@@ -279,10 +279,10 @@ class RoutineGeneratorService {
       ),
       WorkoutDayEntity(
         dayNumber: 2,
-        dayName: 'Día 2 — HIIT + Core',
+        dayName: 'DÃ­a 2 â€” HIIT + Core',
         focus: 'Cardio intenso',
         exercises: [
-          const ExerciseEntity(name: 'Calentamiento: trote suave', sets: 1, reps: '5 min', rest: '—'),
+          const ExerciseEntity(name: 'Calentamiento: trote suave', sets: 1, reps: '5 min', rest: 'â€”'),
           const ExerciseEntity(name: 'Burpees', sets: 4, reps: '10', rest: '60s'),
           const ExerciseEntity(name: 'Box Jumps', sets: 4, reps: '10', rest: '60s'),
           const ExerciseEntity(name: 'Thruster con mancuernas', sets: 4, reps: '12', rest: '60s'),
@@ -292,49 +292,49 @@ class RoutineGeneratorService {
       ),
       WorkoutDayEntity(
         dayNumber: 3,
-        dayName: 'Día 3 — Tren Inferior',
-        focus: 'Cuádriceps · Isquios · Glúteos',
+        dayName: 'DÃ­a 3 â€” Tren Inferior',
+        focus: 'CuÃ¡driceps Â· Isquios Â· GlÃºteos',
         exercises: [
           const ExerciseEntity(name: 'Sentadilla con barra', sets: 4, reps: '10', rest: '90s'),
           const ExerciseEntity(name: 'Peso muerto rumano', sets: 4, reps: '12', rest: '90s'),
           const ExerciseEntity(name: 'Prensa de piernas', sets: 3, reps: '15', rest: '75s'),
           const ExerciseEntity(name: 'Curl femoral tumbado', sets: 3, reps: '12', rest: '60s'),
-          const ExerciseEntity(name: 'Elevación de gemelos de pie', sets: 4, reps: '20', rest: '45s'),
+          const ExerciseEntity(name: 'ElevaciÃ³n de gemelos de pie', sets: 4, reps: '20', rest: '45s'),
         ],
       ),
       WorkoutDayEntity(
         dayNumber: 4,
-        dayName: 'Día 4 — Tren Superior (Tirón)',
-        focus: 'Espalda · Bíceps',
+        dayName: 'DÃ­a 4 â€” Tren Superior (TirÃ³n)',
+        focus: 'Espalda Â· BÃ­ceps',
         exercises: [
-          const ExerciseEntity(name: 'Dominadas (o jalón al pecho)', sets: 4, reps: '8-10', rest: '90s'),
+          const ExerciseEntity(name: 'Dominadas (o jalÃ³n al pecho)', sets: 4, reps: '8-10', rest: '90s'),
           const ExerciseEntity(name: 'Remo con barra', sets: 4, reps: '10', rest: '75s'),
           const ExerciseEntity(name: 'Remo en polea sentado', sets: 3, reps: '12', rest: '60s'),
-          const ExerciseEntity(name: 'Curl de bíceps con barra', sets: 3, reps: '12', rest: '60s'),
+          const ExerciseEntity(name: 'Curl de bÃ­ceps con barra', sets: 3, reps: '12', rest: '60s'),
           const ExerciseEntity(name: 'Curl martillo', sets: 3, reps: '12', rest: '45s'),
         ],
       ),
       WorkoutDayEntity(
         dayNumber: 5,
-        dayName: 'Día 5 — Cardio Zona 2 + Abdomen',
+        dayName: 'DÃ­a 5 â€” Cardio Zona 2 + Abdomen',
         focus: 'Quema de grasa sostenida',
         exercises: [
-          const ExerciseEntity(name: 'Carrera continua o bicicleta', sets: 1, reps: '35–45 min', rest: '—', notes: 'FC: 60–70% máximo'),
+          const ExerciseEntity(name: 'Carrera continua o bicicleta', sets: 1, reps: '35â€“45 min', rest: 'â€”', notes: 'FC: 60â€“70% mÃ¡ximo'),
           const ExerciseEntity(name: 'Plancha abdominal', sets: 4, reps: '45s', rest: '30s'),
           const ExerciseEntity(name: 'Tijeras abdominales', sets: 3, reps: '15', rest: '30s'),
-          const ExerciseEntity(name: 'Elevación de piernas colgado', sets: 3, reps: '12', rest: '45s'),
+          const ExerciseEntity(name: 'ElevaciÃ³n de piernas colgado', sets: 3, reps: '12', rest: '45s'),
         ],
       ),
       WorkoutDayEntity(
         dayNumber: 6,
-        dayName: 'Día 6 — Full Body Circuito',
-        focus: 'Quema metabólica',
+        dayName: 'DÃ­a 6 â€” Full Body Circuito',
+        focus: 'Quema metabÃ³lica',
         exercises: [
           const ExerciseEntity(name: 'Sentadilla + press (thrusters)', sets: 4, reps: '12', rest: '60s'),
           const ExerciseEntity(name: 'Peso muerto + remo', sets: 4, reps: '10', rest: '60s'),
           const ExerciseEntity(name: 'Escaladores (Mountain Climbers)', sets: 4, reps: '30s', rest: '30s'),
           const ExerciseEntity(name: 'Press de banca con mancuernas', sets: 3, reps: '12', rest: '60s'),
-          const ExerciseEntity(name: 'Saltos al cajón', sets: 3, reps: '10', rest: '60s'),
+          const ExerciseEntity(name: 'Saltos al cajÃ³n', sets: 3, reps: '10', rest: '60s'),
         ],
       ),
     ];
@@ -343,7 +343,7 @@ class RoutineGeneratorService {
 
   static List<WorkoutDayEntity> _wlAdvanced(int days) {
     final base = _wlIntermediate(days);
-    // En nivel avanzado se incrementan series y se añade más intensidad
+    // En nivel avanzado se incrementan series y se aÃ±ade mÃ¡s intensidad
     return base.map((day) {
       final upgraded = day.exercises.map((ex) {
         if (ex.sets < 5) {
@@ -366,9 +366,9 @@ class RoutineGeneratorService {
     }).toList();
   }
 
-  // ══════════════════════════════════════════════════════════════════════════
-  // GANAR MÚSCULO
-  // ══════════════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  // GANAR MÃšSCULO
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
   static List<WorkoutDayEntity> _muscleGainRoutine(String level, int days) {
     if (level == 'Principiante') return _mgBeginner(days);
@@ -380,25 +380,25 @@ class RoutineGeneratorService {
     final allDays = [
       WorkoutDayEntity(
         dayNumber: 1,
-        dayName: 'Día 1 — Cuerpo Completo A',
+        dayName: 'DÃ­a 1 â€” Cuerpo Completo A',
         focus: 'Fuerza base',
         exercises: [
           const ExerciseEntity(name: 'Sentadilla con barra (o goblet)', sets: 3, reps: '10', rest: '90s'),
           const ExerciseEntity(name: 'Press de banca', sets: 3, reps: '10', rest: '90s'),
           const ExerciseEntity(name: 'Remo pendlay', sets: 3, reps: '10', rest: '90s'),
           const ExerciseEntity(name: 'Press de hombro', sets: 3, reps: '10', rest: '75s'),
-          const ExerciseEntity(name: 'Curl de bíceps', sets: 2, reps: '12', rest: '60s'),
-          const ExerciseEntity(name: 'Extensión de tríceps', sets: 2, reps: '12', rest: '60s'),
+          const ExerciseEntity(name: 'Curl de bÃ­ceps', sets: 2, reps: '12', rest: '60s'),
+          const ExerciseEntity(name: 'ExtensiÃ³n de trÃ­ceps', sets: 2, reps: '12', rest: '60s'),
         ],
       ),
       WorkoutDayEntity(
         dayNumber: 2,
-        dayName: 'Día 2 — Cuerpo Completo B',
+        dayName: 'DÃ­a 2 â€” Cuerpo Completo B',
         focus: 'Fuerza e hipertrofia',
         exercises: [
           const ExerciseEntity(name: 'Peso muerto', sets: 3, reps: '8', rest: '120s'),
           const ExerciseEntity(name: 'Press de banca inclinado', sets: 3, reps: '10', rest: '90s'),
-          const ExerciseEntity(name: 'Jalón al pecho', sets: 3, reps: '10', rest: '90s'),
+          const ExerciseEntity(name: 'JalÃ³n al pecho', sets: 3, reps: '10', rest: '90s'),
           const ExerciseEntity(name: 'Zancadas con mancuernas', sets: 3, reps: '10 c/pierna', rest: '75s'),
           const ExerciseEntity(name: 'Elevaciones laterales', sets: 3, reps: '12', rest: '60s'),
           const ExerciseEntity(name: 'Plancha abdominal', sets: 3, reps: '30s', rest: '30s'),
@@ -406,11 +406,11 @@ class RoutineGeneratorService {
       ),
       WorkoutDayEntity(
         dayNumber: 3,
-        dayName: 'Día 3 — Cuerpo Completo C',
+        dayName: 'DÃ­a 3 â€” Cuerpo Completo C',
         focus: 'Potencia',
         exercises: [
           const ExerciseEntity(name: 'Sentadilla frontal', sets: 4, reps: '8', rest: '120s'),
-          const ExerciseEntity(name: 'Dominadas con agarre supino', sets: 3, reps: 'Máx', rest: '90s'),
+          const ExerciseEntity(name: 'Dominadas con agarre supino', sets: 3, reps: 'MÃ¡x', rest: '90s'),
           const ExerciseEntity(name: 'Press militar con barra', sets: 3, reps: '8', rest: '90s'),
           const ExerciseEntity(name: 'Hip Thrust', sets: 3, reps: '12', rest: '75s'),
           const ExerciseEntity(name: 'Curl concentrado', sets: 3, reps: '12', rest: '60s'),
@@ -419,12 +419,12 @@ class RoutineGeneratorService {
       ),
       WorkoutDayEntity(
         dayNumber: 4,
-        dayName: 'Día 4 — Tren Inferior',
+        dayName: 'DÃ­a 4 â€” Tren Inferior',
         focus: 'Piernas completas',
         exercises: [
-          const ExerciseEntity(name: 'Sentadilla búlgara', sets: 4, reps: '10 c/pierna', rest: '90s'),
+          const ExerciseEntity(name: 'Sentadilla bÃºlgara', sets: 4, reps: '10 c/pierna', rest: '90s'),
           const ExerciseEntity(name: 'Prensa de piernas', sets: 4, reps: '12', rest: '90s'),
-          const ExerciseEntity(name: 'Extensión de cuádriceps', sets: 3, reps: '15', rest: '60s'),
+          const ExerciseEntity(name: 'ExtensiÃ³n de cuÃ¡driceps', sets: 3, reps: '15', rest: '60s'),
           const ExerciseEntity(name: 'Curl femoral', sets: 3, reps: '12', rest: '60s'),
           const ExerciseEntity(name: 'Gemelos en prensa', sets: 4, reps: '20', rest: '45s'),
         ],
@@ -437,7 +437,7 @@ class RoutineGeneratorService {
     final allDays = [
       WorkoutDayEntity(
         dayNumber: 1,
-        dayName: 'Día 1 — Pecho y Tríceps',
+        dayName: 'DÃ­a 1 â€” Pecho y TrÃ­ceps',
         focus: 'Empuje superior',
         exercises: [
           const ExerciseEntity(name: 'Press de banca con barra', sets: 4, reps: '8-10', rest: '120s'),
@@ -445,30 +445,30 @@ class RoutineGeneratorService {
           const ExerciseEntity(name: 'Aperturas en banco plano', sets: 3, reps: '12', rest: '75s'),
           const ExerciseEntity(name: 'Press de pecho en polea', sets: 3, reps: '15', rest: '60s'),
           const ExerciseEntity(name: 'Fondos con lastre', sets: 3, reps: '10', rest: '90s'),
-          const ExerciseEntity(name: 'Extensión de tríceps en polea', sets: 3, reps: '15', rest: '60s'),
+          const ExerciseEntity(name: 'ExtensiÃ³n de trÃ­ceps en polea', sets: 3, reps: '15', rest: '60s'),
         ],
       ),
       WorkoutDayEntity(
         dayNumber: 2,
-        dayName: 'Día 2 — Espalda y Bíceps',
-        focus: 'Tirón superior',
+        dayName: 'DÃ­a 2 â€” Espalda y BÃ­ceps',
+        focus: 'TirÃ³n superior',
         exercises: [
           const ExerciseEntity(name: 'Peso muerto convencional', sets: 4, reps: '6', rest: '150s'),
           const ExerciseEntity(name: 'Dominadas lastradas', sets: 4, reps: '8', rest: '120s'),
           const ExerciseEntity(name: 'Remo con barra (Pendlay)', sets: 3, reps: '8', rest: '90s'),
           const ExerciseEntity(name: 'Remo en polea baja', sets: 3, reps: '12', rest: '75s'),
-          const ExerciseEntity(name: 'Curl de bíceps con barra EZ', sets: 3, reps: '10', rest: '75s'),
+          const ExerciseEntity(name: 'Curl de bÃ­ceps con barra EZ', sets: 3, reps: '10', rest: '75s'),
           const ExerciseEntity(name: 'Curl inclinado con mancuernas', sets: 3, reps: '12', rest: '60s'),
         ],
       ),
       WorkoutDayEntity(
         dayNumber: 3,
-        dayName: 'Día 3 — Piernas',
-        focus: 'Cuádriceps · Isquios · Glúteos',
+        dayName: 'DÃ­a 3 â€” Piernas',
+        focus: 'CuÃ¡driceps Â· Isquios Â· GlÃºteos',
         exercises: [
           const ExerciseEntity(name: 'Sentadilla trasera', sets: 5, reps: '5', rest: '180s'),
-          const ExerciseEntity(name: 'Sentadilla búlgara', sets: 3, reps: '10 c/pierna', rest: '90s'),
-          const ExerciseEntity(name: 'Extensión de cuádriceps', sets: 3, reps: '15', rest: '60s'),
+          const ExerciseEntity(name: 'Sentadilla bÃºlgara', sets: 3, reps: '10 c/pierna', rest: '90s'),
+          const ExerciseEntity(name: 'ExtensiÃ³n de cuÃ¡driceps', sets: 3, reps: '15', rest: '60s'),
           const ExerciseEntity(name: 'Curl femoral tumbado', sets: 3, reps: '12', rest: '60s'),
           const ExerciseEntity(name: 'Hip Thrust con barra', sets: 4, reps: '10', rest: '90s'),
           const ExerciseEntity(name: 'Gemelos de pie en multipower', sets: 4, reps: '18', rest: '45s'),
@@ -476,13 +476,13 @@ class RoutineGeneratorService {
       ),
       WorkoutDayEntity(
         dayNumber: 4,
-        dayName: 'Día 4 — Hombro y Abdomen',
-        focus: 'Deltoides · Core',
+        dayName: 'DÃ­a 4 â€” Hombro y Abdomen',
+        focus: 'Deltoides Â· Core',
         exercises: [
           const ExerciseEntity(name: 'Press militar con barra', sets: 4, reps: '8', rest: '120s'),
           const ExerciseEntity(name: 'Press Arnold', sets: 3, reps: '12', rest: '90s'),
           const ExerciseEntity(name: 'Elevaciones laterales', sets: 4, reps: '15', rest: '60s'),
-          const ExerciseEntity(name: 'Pájaro (Bent-over lateral raise)', sets: 3, reps: '15', rest: '60s'),
+          const ExerciseEntity(name: 'PÃ¡jaro (Bent-over lateral raise)', sets: 3, reps: '15', rest: '60s'),
           const ExerciseEntity(name: 'Encogimientos con barra', sets: 3, reps: '15', rest: '60s'),
           const ExerciseEntity(name: 'Plancha abdominal', sets: 3, reps: '60s', rest: '30s'),
           const ExerciseEntity(name: 'Ab wheel (rueda abdominal)', sets: 3, reps: '10', rest: '60s'),
@@ -490,7 +490,7 @@ class RoutineGeneratorService {
       ),
       WorkoutDayEntity(
         dayNumber: 5,
-        dayName: 'Día 5 — Full Body Potencia',
+        dayName: 'DÃ­a 5 â€” Full Body Potencia',
         focus: 'Fuerza funcional',
         exercises: [
           const ExerciseEntity(name: 'Clean and press', sets: 4, reps: '6', rest: '150s'),
@@ -502,15 +502,15 @@ class RoutineGeneratorService {
       ),
       WorkoutDayEntity(
         dayNumber: 6,
-        dayName: 'Día 6 — Brazos + Core',
-        focus: 'Bíceps · Tríceps · Abdomen',
+        dayName: 'DÃ­a 6 â€” Brazos + Core',
+        focus: 'BÃ­ceps Â· TrÃ­ceps Â· Abdomen',
         exercises: [
-          const ExerciseEntity(name: 'Curl araña', sets: 4, reps: '10', rest: '75s'),
-          const ExerciseEntity(name: 'Curl de bíceps en polea baja', sets: 3, reps: '15', rest: '60s'),
-          const ExerciseEntity(name: 'Press francés', sets: 4, reps: '10', rest: '75s'),
+          const ExerciseEntity(name: 'Curl araÃ±a', sets: 4, reps: '10', rest: '75s'),
+          const ExerciseEntity(name: 'Curl de bÃ­ceps en polea baja', sets: 3, reps: '15', rest: '60s'),
+          const ExerciseEntity(name: 'Press francÃ©s', sets: 4, reps: '10', rest: '75s'),
           const ExerciseEntity(name: 'Diamond push-ups', sets: 3, reps: '12', rest: '60s'),
-          const ExerciseEntity(name: 'Dragon flag (progresión)', sets: 3, reps: '6', rest: '90s'),
-          const ExerciseEntity(name: 'Elevación de piernas colgado', sets: 3, reps: '12', rest: '60s'),
+          const ExerciseEntity(name: 'Dragon flag (progresiÃ³n)', sets: 3, reps: '6', rest: '90s'),
+          const ExerciseEntity(name: 'ElevaciÃ³n de piernas colgado', sets: 3, reps: '12', rest: '60s'),
         ],
       ),
     ];
@@ -518,7 +518,7 @@ class RoutineGeneratorService {
   }
 
   static List<WorkoutDayEntity> _mgAdvanced(int days) {
-    // Avanzado añade técnicas de intensidad: dropsets, superseries
+    // Avanzado aÃ±ade tÃ©cnicas de intensidad: dropsets, superseries
     final base = _mgIntermediate(days);
     return base.map((day) {
       return WorkoutDayEntity(
@@ -532,7 +532,7 @@ class RoutineGeneratorService {
             reps: ex.reps,
             rest: ex.rest,
             notes: ex.notes.isEmpty
-                ? 'Técnica avanzada: aplica dropset en última serie'
+                ? 'TÃ©cnica avanzada: aplica dropset en Ãºltima serie'
                 : ex.notes,
           );
         }).toList(),
@@ -540,33 +540,33 @@ class RoutineGeneratorService {
     }).toList();
   }
 
-  // ══════════════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   // RESISTENCIA
-  // ══════════════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
   static List<WorkoutDayEntity> _enduranceRoutine(String level, int days) {
     final multiplier = level == 'Principiante'
         ? 1.0
         : level == 'Intermedio'
             ? 1.3
-            : 1.6; // Factor para ajustar duración
+            : 1.6; // Factor para ajustar duraciÃ³n
     final durationMin = (30 * multiplier).round();
 
     final allDays = [
       WorkoutDayEntity(
         dayNumber: 1,
-        dayName: 'Día 1 — Carrera de Base',
-        focus: 'Zona aeróbica 2',
+        dayName: 'DÃ­a 1 â€” Carrera de Base',
+        focus: 'Zona aerÃ³bica 2',
         exercises: [
-          ExerciseEntity(name: 'Calentamiento: caminata', sets: 1, reps: '5 min', rest: '—'),
-          ExerciseEntity(name: 'Carrera continua', sets: 1, reps: '$durationMin min', rest: '—', notes: 'Ritmo conversacional (FC 65–75%)'),
-          const ExerciseEntity(name: 'Estiramiento de cuádriceps', sets: 2, reps: '30s c/lado', rest: '10s'),
+          ExerciseEntity(name: 'Calentamiento: caminata', sets: 1, reps: '5 min', rest: 'â€”'),
+          ExerciseEntity(name: 'Carrera continua', sets: 1, reps: '$durationMin min', rest: 'â€”', notes: 'Ritmo conversacional (FC 65â€“75%)'),
+          const ExerciseEntity(name: 'Estiramiento de cuÃ¡driceps', sets: 2, reps: '30s c/lado', rest: '10s'),
           const ExerciseEntity(name: 'Estiramiento de pantorrilla', sets: 2, reps: '30s c/lado', rest: '10s'),
         ],
       ),
       WorkoutDayEntity(
         dayNumber: 2,
-        dayName: 'Día 2 — Fuerza Funcional',
+        dayName: 'DÃ­a 2 â€” Fuerza Funcional',
         focus: 'Soporte muscular',
         exercises: [
           const ExerciseEntity(name: 'Sentadilla con peso corporal', sets: 3, reps: '20', rest: '60s'),
@@ -579,63 +579,63 @@ class RoutineGeneratorService {
       ),
       WorkoutDayEntity(
         dayNumber: 3,
-        dayName: 'Día 3 — Intervalos Aeróbicos',
-        focus: 'Umbral láctico',
+        dayName: 'DÃ­a 3 â€” Intervalos AerÃ³bicos',
+        focus: 'Umbral lÃ¡ctico',
         exercises: [
-          const ExerciseEntity(name: 'Calentamiento: trote suave', sets: 1, reps: '10 min', rest: '—'),
-          const ExerciseEntity(name: 'Intervalos (1 min rápido / 2 min suave)', sets: 6, reps: '3 min c/u', rest: 'incluido'),
-          const ExerciseEntity(name: 'Vuelta a la calma: trote', sets: 1, reps: '5 min', rest: '—'),
-          const ExerciseEntity(name: 'Estiramiento completo', sets: 1, reps: '10 min', rest: '—'),
+          const ExerciseEntity(name: 'Calentamiento: trote suave', sets: 1, reps: '10 min', rest: 'â€”'),
+          const ExerciseEntity(name: 'Intervalos (1 min rÃ¡pido / 2 min suave)', sets: 6, reps: '3 min c/u', rest: 'incluido'),
+          const ExerciseEntity(name: 'Vuelta a la calma: trote', sets: 1, reps: '5 min', rest: 'â€”'),
+          const ExerciseEntity(name: 'Estiramiento completo', sets: 1, reps: '10 min', rest: 'â€”'),
         ],
       ),
       WorkoutDayEntity(
         dayNumber: 4,
-        dayName: 'Día 4 — Bicicleta / Elíptica',
+        dayName: 'DÃ­a 4 â€” Bicicleta / ElÃ­ptica',
         focus: 'Cardio cruzado',
         exercises: [
-          ExerciseEntity(name: 'Bicicleta estática o elíptica', sets: 1, reps: '${(durationMin + 10)} min', rest: '—', notes: 'Baja impacto, alta cadencia'),
+          ExerciseEntity(name: 'Bicicleta estÃ¡tica o elÃ­ptica', sets: 1, reps: '${(durationMin + 10)} min', rest: 'â€”', notes: 'Baja impacto, alta cadencia'),
           const ExerciseEntity(name: 'Core: plancha lateral', sets: 3, reps: '30s c/lado', rest: '20s'),
-          const ExerciseEntity(name: 'Glúteo en cuadrupedia', sets: 3, reps: '15 c/lado', rest: '30s'),
+          const ExerciseEntity(name: 'GlÃºteo en cuadrupedia', sets: 3, reps: '15 c/lado', rest: '30s'),
         ],
       ),
       WorkoutDayEntity(
         dayNumber: 5,
-        dayName: 'Día 5 — Carrera Larga',
-        focus: 'Resistencia aeróbica prolongada',
+        dayName: 'DÃ­a 5 â€” Carrera Larga',
+        focus: 'Resistencia aerÃ³bica prolongada',
         exercises: [
-          const ExerciseEntity(name: 'Calentamiento: caminata rápida', sets: 1, reps: '5 min', rest: '—'),
-          ExerciseEntity(name: 'Carrera larga continua', sets: 1, reps: '${(durationMin * 1.5).round()} min', rest: '—', notes: 'Ritmo suave y constante'),
-          const ExerciseEntity(name: 'Enfriamiento y estiramiento', sets: 1, reps: '10 min', rest: '—'),
+          const ExerciseEntity(name: 'Calentamiento: caminata rÃ¡pida', sets: 1, reps: '5 min', rest: 'â€”'),
+          ExerciseEntity(name: 'Carrera larga continua', sets: 1, reps: '${(durationMin * 1.5).round()} min', rest: 'â€”', notes: 'Ritmo suave y constante'),
+          const ExerciseEntity(name: 'Enfriamiento y estiramiento', sets: 1, reps: '10 min', rest: 'â€”'),
         ],
       ),
       WorkoutDayEntity(
         dayNumber: 6,
-        dayName: 'Día 6 — Recuperación Activa',
+        dayName: 'DÃ­a 6 â€” RecuperaciÃ³n Activa',
         focus: 'Movilidad y flexibilidad',
         exercises: [
-          const ExerciseEntity(name: 'Yoga / estiramiento dinámico', sets: 1, reps: '20 min', rest: '—'),
-          const ExerciseEntity(name: 'Espuma (foam rolling)', sets: 1, reps: '10 min', rest: '—'),
-          const ExerciseEntity(name: 'Respiración diafragmática', sets: 3, reps: '5 min', rest: '—'),
+          const ExerciseEntity(name: 'Yoga / estiramiento dinÃ¡mico', sets: 1, reps: '20 min', rest: 'â€”'),
+          const ExerciseEntity(name: 'Espuma (foam rolling)', sets: 1, reps: '10 min', rest: 'â€”'),
+          const ExerciseEntity(name: 'RespiraciÃ³n diafragmÃ¡tica', sets: 3, reps: '5 min', rest: 'â€”'),
         ],
       ),
     ];
     return allDays.take(days).toList();
   }
 
-  // ══════════════════════════════════════════════════════════════════════════
-  // REHABILITACIÓN
-  // ══════════════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  // REHABILITACIÃ“N
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
   static List<WorkoutDayEntity> _rehabilitationRoutine(
       String level, int days) {
     final allDays = [
       WorkoutDayEntity(
         dayNumber: 1,
-        dayName: 'Día 1 — Movilidad y Flexibilidad',
+        dayName: 'DÃ­a 1 â€” Movilidad y Flexibilidad',
         focus: 'Rango de movimiento',
         exercises: [
           const ExerciseEntity(name: 'Rotaciones de cuello suaves', sets: 2, reps: '10 c/lado', rest: '30s', notes: 'Movimientos lentos y controlados'),
-          const ExerciseEntity(name: 'Círculos de hombros', sets: 2, reps: '10 adelante/atrás', rest: '20s'),
+          const ExerciseEntity(name: 'CÃ­rculos de hombros', sets: 2, reps: '10 adelante/atrÃ¡s', rest: '20s'),
           const ExerciseEntity(name: 'Estiramiento de pecho (pared)', sets: 3, reps: '30s c/lado', rest: '15s'),
           const ExerciseEntity(name: 'Cat-Cow (movilidad lumbar)', sets: 3, reps: '10', rest: '30s'),
           const ExerciseEntity(name: 'Estiramiento de cadera en mariposa', sets: 3, reps: '45s', rest: '15s'),
@@ -644,74 +644,74 @@ class RoutineGeneratorService {
       ),
       WorkoutDayEntity(
         dayNumber: 2,
-        dayName: 'Día 2 — Estabilidad de Core',
+        dayName: 'DÃ­a 2 â€” Estabilidad de Core',
         focus: 'Musculatura profunda',
         exercises: [
-          const ExerciseEntity(name: 'Activación transverso abdominal', sets: 3, reps: '10 respiraciones', rest: '30s', notes: 'Contrae el abdomen sin mover la columna'),
-          const ExerciseEntity(name: 'Plancha abdominal (progresión)', sets: 3, reps: '15-30s', rest: '45s'),
-          const ExerciseEntity(name: 'Perro-pájaro (Bird-Dog)', sets: 3, reps: '8 c/lado', rest: '30s'),
-          const ExerciseEntity(name: 'Puente de glúteos', sets: 3, reps: '15', rest: '45s'),
+          const ExerciseEntity(name: 'ActivaciÃ³n transverso abdominal', sets: 3, reps: '10 respiraciones', rest: '30s', notes: 'Contrae el abdomen sin mover la columna'),
+          const ExerciseEntity(name: 'Plancha abdominal (progresiÃ³n)', sets: 3, reps: '15-30s', rest: '45s'),
+          const ExerciseEntity(name: 'Perro-pÃ¡jaro (Bird-Dog)', sets: 3, reps: '8 c/lado', rest: '30s'),
+          const ExerciseEntity(name: 'Puente de glÃºteos', sets: 3, reps: '15', rest: '45s'),
           const ExerciseEntity(name: 'Clamshell con banda', sets: 3, reps: '15 c/lado', rest: '30s'),
           const ExerciseEntity(name: 'Superman en suelo', sets: 3, reps: '10', rest: '30s'),
         ],
       ),
       WorkoutDayEntity(
         dayNumber: 3,
-        dayName: 'Día 3 — Fortalecimiento Suave (Tren Inferior)',
+        dayName: 'DÃ­a 3 â€” Fortalecimiento Suave (Tren Inferior)',
         focus: 'Piernas de bajo impacto',
         exercises: [
           const ExerciseEntity(name: 'Sentadilla asistida (silla)', sets: 3, reps: '10', rest: '60s', notes: 'Usa apoyo si es necesario'),
-          const ExerciseEntity(name: 'Elevación de talones sentado', sets: 3, reps: '20', rest: '30s'),
-          const ExerciseEntity(name: 'Abducción de cadera tumbado', sets: 3, reps: '15 c/lado', rest: '30s'),
-          const ExerciseEntity(name: 'Extensión de rodilla sentado (banda)', sets: 3, reps: '15', rest: '45s'),
+          const ExerciseEntity(name: 'ElevaciÃ³n de talones sentado', sets: 3, reps: '20', rest: '30s'),
+          const ExerciseEntity(name: 'AbducciÃ³n de cadera tumbado', sets: 3, reps: '15 c/lado', rest: '30s'),
+          const ExerciseEntity(name: 'ExtensiÃ³n de rodilla sentado (banda)', sets: 3, reps: '15', rest: '45s'),
           const ExerciseEntity(name: 'Marcha en el sitio', sets: 3, reps: '1 min', rest: '30s'),
         ],
       ),
       WorkoutDayEntity(
         dayNumber: 4,
-        dayName: 'Día 4 — Fortalecimiento Suave (Tren Superior)',
+        dayName: 'DÃ­a 4 â€” Fortalecimiento Suave (Tren Superior)',
         focus: 'Hombros y espalda baja',
         exercises: [
-          const ExerciseEntity(name: 'Retracción escapular', sets: 3, reps: '15', rest: '30s', notes: 'Promueve la postura correcta'),
+          const ExerciseEntity(name: 'RetracciÃ³n escapular', sets: 3, reps: '15', rest: '30s', notes: 'Promueve la postura correcta'),
           const ExerciseEntity(name: 'Press de hombros con banda (sentado)', sets: 3, reps: '12', rest: '45s'),
-          const ExerciseEntity(name: 'Remo con banda elástica', sets: 3, reps: '15', rest: '45s'),
-          const ExerciseEntity(name: 'Rotación externa de hombro (banda)', sets: 3, reps: '15 c/lado', rest: '30s'),
+          const ExerciseEntity(name: 'Remo con banda elÃ¡stica', sets: 3, reps: '15', rest: '45s'),
+          const ExerciseEntity(name: 'RotaciÃ³n externa de hombro (banda)', sets: 3, reps: '15 c/lado', rest: '30s'),
           const ExerciseEntity(name: 'Face pull con banda', sets: 3, reps: '15', rest: '30s'),
         ],
       ),
       WorkoutDayEntity(
         dayNumber: 5,
-        dayName: 'Día 5 — Cardio de Bajo Impacto',
+        dayName: 'DÃ­a 5 â€” Cardio de Bajo Impacto',
         focus: 'Actividad cardiovascular suave',
         exercises: [
-          const ExerciseEntity(name: 'Caminata a paso ligero', sets: 1, reps: '25-30 min', rest: '—', notes: 'Ritmo cómodo, sin dolor'),
-          const ExerciseEntity(name: 'Bicicleta estática (nivel bajo)', sets: 1, reps: '15 min', rest: '—'),
-          const ExerciseEntity(name: 'Estiramiento post-cardio', sets: 1, reps: '10 min', rest: '—'),
+          const ExerciseEntity(name: 'Caminata a paso ligero', sets: 1, reps: '25-30 min', rest: 'â€”', notes: 'Ritmo cÃ³modo, sin dolor'),
+          const ExerciseEntity(name: 'Bicicleta estÃ¡tica (nivel bajo)', sets: 1, reps: '15 min', rest: 'â€”'),
+          const ExerciseEntity(name: 'Estiramiento post-cardio', sets: 1, reps: '10 min', rest: 'â€”'),
         ],
       ),
       WorkoutDayEntity(
         dayNumber: 6,
-        dayName: 'Día 6 — Yoga Terapéutico',
-        focus: 'Recuperación integral',
+        dayName: 'DÃ­a 6 â€” Yoga TerapÃ©utico',
+        focus: 'RecuperaciÃ³n integral',
         exercises: [
-          const ExerciseEntity(name: 'Postura del niño (Child\'s pose)', sets: 3, reps: '1 min', rest: '20s'),
+          const ExerciseEntity(name: 'Postura del niÃ±o (Child\'s pose)', sets: 3, reps: '1 min', rest: '20s'),
           const ExerciseEntity(name: 'Giro espinal sentado', sets: 2, reps: '30s c/lado', rest: '20s'),
           const ExerciseEntity(name: 'Estiramiento de piriforme (figura 4)', sets: 2, reps: '45s c/lado', rest: '15s'),
-          const ExerciseEntity(name: 'Postura del cadáver (Savasana)', sets: 1, reps: '5 min', rest: '—', notes: 'Relajación total'),
-          const ExerciseEntity(name: 'Respiración 4-7-8', sets: 5, reps: '1 ciclo', rest: '—'),
+          const ExerciseEntity(name: 'Postura del cadÃ¡ver (Savasana)', sets: 1, reps: '5 min', rest: 'â€”', notes: 'RelajaciÃ³n total'),
+          const ExerciseEntity(name: 'RespiraciÃ³n 4-7-8', sets: 5, reps: '1 ciclo', rest: 'â€”'),
         ],
       ),
     ];
     return allDays.take(days).toList();
   }
 
-  // ══════════════════════════════════════════════════════════════════════════
-  // SUSTITUCIÓN SIN EQUIPO (Casa / Aire libre sin equipamiento)
-  // ══════════════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  // SUSTITUCIÃ“N SIN EQUIPO (Casa / Aire libre sin equipamiento)
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-  /// Mapa: nombre exacto del ejercicio con equipo → alternativa sin equipo
+  /// Mapa: nombre exacto del ejercicio con equipo â†’ alternativa sin equipo
   static const Map<String, String> _gymToBodyweight = {
-    // ── Mancuernas ──────────────────────────────────────────────────────────
+    // â”€â”€ Mancuernas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     'Remo con mancuerna': 'Remo invertido (debajo de mesa)',
     'Press de pecho con mancuernas': 'Flexiones de brazos',
     'Press de hombro con mancuernas': 'Pike push-ups',
@@ -724,7 +724,7 @@ class RoutineGeneratorService {
     'Press Arnold': 'Pike push-ups',
     'Sentadilla goblet': 'Sentadilla con peso corporal',
     'Elevaciones laterales': 'Elevaciones laterales lentas sin peso',
-    // ── Barra ────────────────────────────────────────────────────────────────
+    // â”€â”€ Barra â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     'Press de banca con barra': 'Flexiones de brazos',
     'Press de banca inclinado': 'Flexiones con pies elevados',
     'Press de banca con pausa': 'Flexiones con pausa',
@@ -742,62 +742,62 @@ class RoutineGeneratorService {
     'Remo pendlay explosivo': 'Remo invertido explosivo',
     'Press militar con barra': 'Pike push-ups',
     'Encogimientos con barra': 'Encogimientos de hombros sin peso',
-    'Curl de bíceps con barra EZ': 'Flexiones con agarre supino',
-    'Curl de bíceps con barra': 'Flexiones con agarre supino',
-    'Curl de bíceps': 'Curl isometrico con toalla',
+    'Curl de bÃ­ceps con barra EZ': 'Flexiones con agarre supino',
+    'Curl de bÃ­ceps con barra': 'Flexiones con agarre supino',
+    'Curl de bÃ­ceps': 'Curl isometrico con toalla',
     'Curl martillo': 'Flexiones diamante',
-    'Curl araña': 'Flexiones concentradas agarre supino',
+    'Curl araÃ±a': 'Flexiones concentradas agarre supino',
     'Hip Thrust con barra': 'Puente de gluteos',
     'Hip Thrust': 'Puente de gluteos',
     'Clean and press': 'Burpee con salto explosivo',
     'Farmer Walks': 'Caminata en puntillas (isometrico de hombros)',
-    // ── Poleas y maquinas ────────────────────────────────────────────────────
-    'Jalón al pecho (polea)': 'Dominadas (o remo invertido)',
+    // â”€â”€ Poleas y maquinas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    'JalÃ³n al pecho (polea)': 'Dominadas (o remo invertido)',
     'Aperturas en polea': 'Aperturas en posicion de plancha',
     'Press de pecho en polea': 'Flexiones de brazos',
     'Remo en polea sentado': 'Remo invertido (debajo de mesa)',
     'Remo en polea baja': 'Remo invertido (debajo de mesa)',
-    'Extensión de tríceps en polea': 'Flexiones diamante',
-    'Curl de bíceps en polea baja': 'Curl isometrico con toalla',
+    'ExtensiÃ³n de trÃ­ceps en polea': 'Flexiones diamante',
+    'Curl de bÃ­ceps en polea baja': 'Curl isometrico con toalla',
     'Prensa de piernas': 'Sentadilla bulgara sin peso',
-    'Extensión de cuádriceps': 'Sentadilla isometrica en pared',
+    'ExtensiÃ³n de cuÃ¡driceps': 'Sentadilla isometrica en pared',
     'Curl femoral tumbado': 'Curl femoral nordico (con silla como apoyo)',
     'Curl femoral': 'Curl femoral nordico (con silla como apoyo)',
     'Gemelos de pie en multipower': 'Elevacion de gemelos de pie',
     'Gemelos en prensa': 'Elevacion de gemelos de pie',
     'Ab wheel (rueda abdominal)': 'Plancha deslizante en suelo',
-    'Dragon flag (progresión)': 'Plancha con elevacion de piernas',
-    'Elevación de piernas colgado': 'Elevacion de piernas en suelo',
+    'Dragon flag (progresiÃ³n)': 'Plancha con elevacion de piernas',
+    'ElevaciÃ³n de piernas colgado': 'Elevacion de piernas en suelo',
     'Box Jumps': 'Saltos al lugar',
-    'Saltos al cajón': 'Saltos al lugar',
+    'Saltos al cajÃ³n': 'Saltos al lugar',
     'Fondos con lastre': 'Fondos entre sillas',
     'Fondos en paralelas': 'Fondos entre sillas',
     'Dominadas lastradas': 'Dominadas',
-    // ── Combinados / cardio maquina ──────────────────────────────────────────
+    // â”€â”€ Combinados / cardio maquina â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     'Sentadilla + press (thrusters)': 'Sentadilla + salto explosivo',
     'Plancha con remo alternado': 'Plancha con toque de hombro',
-    'Caminata rápida / Bici estática': 'Caminata rapida o marcha en el sitio',
-    'Bicicleta estática o elíptica': 'Saltos de tijera (ritmo moderado)',
+    'Caminata rÃ¡pida / Bici estÃ¡tica': 'Caminata rapida o marcha en el sitio',
+    'Bicicleta estÃ¡tica o elÃ­ptica': 'Saltos de tijera (ritmo moderado)',
     'Carrera continua o bicicleta': 'Carrera continua o caminata rapida',
     'Remo TRX / mancuerna': 'Remo invertido (debajo de mesa)',
-    // ── Bandas (rehabilitacion) ──────────────────────────────────────────────
+    // â”€â”€ Bandas (rehabilitacion) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     'Clamshell con banda': 'Clamshell sin banda',
     'Press de hombros con banda (sentado)': 'Pike push-ups modificados',
-    'Remo con banda elástica': 'Remo invertido (debajo de mesa)',
-    'Rotación externa de hombro (banda)': 'Rotacion de hombro isometrica',
+    'Remo con banda elÃ¡stica': 'Remo invertido (debajo de mesa)',
+    'RotaciÃ³n externa de hombro (banda)': 'Rotacion de hombro isometrica',
     'Face pull con banda': 'YTW en prono (suelo)',
-    'Extensión de rodilla sentado (banda)': 'Extension de rodilla sentado sin banda',
+    'ExtensiÃ³n de rodilla sentado (banda)': 'Extension de rodilla sentado sin banda',
   };
 
   /// Palabras clave que delatan equipo de gimnasio (red de seguridad)
   static const List<String> _gymKeywords = [
     'mancuerna', 'barra', 'banca', 'polea', 'prensa',
-    'multipower', 'jalón', 'máquina', 'lastre', 'TRX',
-    'banda elástica',
+    'multipower', 'jalÃ³n', 'mÃ¡quina', 'lastre', 'TRX',
+    'banda elÃ¡stica',
   ];
 
   /// Reemplaza los ejercicios que requieren equipamiento por alternativas
-  /// de peso corporal en toda la lista de días.
+  /// de peso corporal en toda la lista de dÃ­as.
   static List<WorkoutDayEntity> _substituteEquipment(
       List<WorkoutDayEntity> days) {
     return days.map((day) {
