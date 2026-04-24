@@ -4,6 +4,7 @@ import 'package:horus_app/presentation/providers/auth_provider.dart';
 import 'package:horus_app/presentation/providers/routine_provider.dart';
 import 'package:horus_app/presentation/providers/user_provider.dart';
 import 'package:horus_app/presentation/widgets/custom_drawer.dart';
+import 'package:horus_app/presentation/widgets/user_avatar.dart';
 import 'package:horus_app/routes/app_router.dart';
 import 'package:provider/provider.dart';
 
@@ -67,15 +68,15 @@ class _NoRoutineBody extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: colorScheme.primary.withValues(alpha: 0.1),
+                color: colorScheme.primary.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.fitness_center,
-                size: 72,
-                color: colorScheme.primary,
+              child: Image.asset(
+                'iconos/Icono_Rutina.png',
+                width: 80,
+                height: 80,
               ),
             ),
             const SizedBox(height: 28),
@@ -141,22 +142,10 @@ class _RoutinePreviewBody extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               child: Row(
                 children: [
-                  CircleAvatar(
+                  UserAvatar(
+                    avatarUrl: avatarUrl,
+                    displayName: userName,
                     radius: 28,
-                    backgroundColor: colorScheme.primary,
-                    backgroundImage: avatarUrl != null
-                        ? NetworkImage(avatarUrl!)
-                        : null,
-                    child: avatarUrl == null
-                        ? Text(
-                            userName.substring(0, 1).toUpperCase(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          )
-                        : null,
                   ),
                   const SizedBox(width: 16),
                   Expanded(

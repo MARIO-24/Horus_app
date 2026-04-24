@@ -6,26 +6,27 @@ class AppTheme {
   AppTheme._();
 
   // ── Colores principales ───────────────────────────────────────────────────
-  static const Color _primarySeed = Color(0xFF5C6BC0); // Indigo
-  static const Color _accentOrange = Color(0xFFFF7043); // Orange energético
+  static const Color _primarySeed = Color(0xFFC9A84C); // Dorado Horus
+  static const Color _darkNavy   = Color(0xFF1A1A2E);  // Azul noche oscuro
 
   // ── Tema claro ────────────────────────────────────────────────────────────
   static ThemeData get lightTheme => ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
           seedColor: _primarySeed,
-          secondary: _accentOrange,
+          secondary: _darkNavy,
           brightness: Brightness.light,
         ),
         textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme),
         appBarTheme: AppBarTheme(
-          backgroundColor: const Color(0xFF5C6BC0),
+          backgroundColor: _darkNavy,
           foregroundColor: Colors.white,
           elevation: 0,
           titleTextStyle: GoogleFonts.inter(
-            color: Colors.white,
+            color: const Color(0xFFC9A84C),
             fontSize: 20,
             fontWeight: FontWeight.w600,
+            letterSpacing: 1,
           ),
         ),
         cardTheme: CardThemeData(
@@ -69,18 +70,19 @@ class AppTheme {
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
           seedColor: _primarySeed,
-          secondary: _accentOrange,
+          secondary: _darkNavy,
           brightness: Brightness.dark,
         ),
         textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
         appBarTheme: AppBarTheme(
-          backgroundColor: const Color(0xFF1A1A2E),
+          backgroundColor: const Color(0xFF0F0F1A),
           foregroundColor: Colors.white,
           elevation: 0,
           titleTextStyle: GoogleFonts.inter(
-            color: Colors.white,
+            color: const Color(0xFFC9A84C),
             fontSize: 20,
             fontWeight: FontWeight.w600,
+            letterSpacing: 1,
           ),
         ),
         cardTheme: CardThemeData(
