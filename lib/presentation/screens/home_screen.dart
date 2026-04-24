@@ -63,6 +63,7 @@ class _NoRoutineBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isLight = Theme.of(context).brightness == Brightness.light;
 
     return Center(
       child: SingleChildScrollView(
@@ -73,7 +74,9 @@ class _NoRoutineBody extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: colorScheme.primary.withValues(alpha: 0.08),
+                color: isLight
+                    ? const Color(0xFF1A1A2E).withValues(alpha: 0.18)
+                    : colorScheme.primary.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
               child: Image.asset(
@@ -188,7 +191,7 @@ class _RoutinePreviewBody extends StatelessWidget {
                   icon: Icons.flag_outlined,
                   label: l10n.goalLabel,
                   value: routine.goal,
-                  color: colorScheme.primary,
+                  color: Colors.green,
                 ),
               ),
               const SizedBox(width: 8),
@@ -197,7 +200,7 @@ class _RoutinePreviewBody extends StatelessWidget {
                   icon: Icons.trending_up,
                   label: l10n.levelLabel,
                   value: routine.fitnessLevel,
-                  color: colorScheme.secondary,
+                  color: Colors.red,
                 ),
               ),
               const SizedBox(width: 8),
@@ -206,7 +209,7 @@ class _RoutinePreviewBody extends StatelessWidget {
                   icon: Icons.calendar_today_outlined,
                   label: l10n.daysWeekLabel,
                   value: '${routine.daysPerWeek}',
-                  color: Colors.teal,
+                  color: Colors.blue,
                 ),
               ),
             ],
@@ -292,6 +295,7 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -304,7 +308,8 @@ class _StatCard extends StatelessWidget {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 13,
-                color: color,
+                // onSurface garantiza legibilidad en modo claro y oscuro
+                color: colorScheme.onSurface,
               ),
               textAlign: TextAlign.center,
               maxLines: 2,

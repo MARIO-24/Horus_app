@@ -30,7 +30,10 @@ class ChatBubble extends StatelessWidget {
           if (!isUser) ...[
             CircleAvatar(
               radius: 16,
-              backgroundColor: Colors.transparent,
+              backgroundColor:
+                  Theme.of(context).brightness == Brightness.light
+                      ? const Color(0xFF1A1A2E)
+                      : Colors.transparent,
               child: Image.asset(
                 'iconos/Icono_ChatBot.png',
                 width: 32,
@@ -165,7 +168,10 @@ class _TypingIndicatorState extends State<TypingIndicator>
         children: [
           CircleAvatar(
             radius: 16,
-            backgroundColor: Colors.transparent,
+            backgroundColor:
+                Theme.of(context).brightness == Brightness.light
+                    ? const Color(0xFF1A1A2E)
+                    : Colors.transparent,
             child: Image.asset(
               'iconos/Icono_ChatBot.png',
               width: 32,
