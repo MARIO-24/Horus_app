@@ -16,6 +16,9 @@ class AppL10n {
   static AppL10n readFrom(BuildContext context) =>
       AppL10n._(context.read<LocaleProvider>().locale.languageCode == 'en');
 
+  /// Expone el flag de idioma (true = inglés) para pasarlo a servicios.
+  bool get isEnglish => _en;
+
   // ── Drawer / Navegación ───────────────────────────────────────────────────
   String get navRoutine     => _en ? 'Routine'       : 'Rutina';
   String get navAccount     => _en ? 'Account'       : 'Cuenta';
@@ -132,6 +135,16 @@ class AppL10n {
   String get athlete            => _en ? 'Athlete'                   : 'Atleta';
   String get editProfile        => _en ? 'Edit profile'              : 'Editar perfil';
   String get saveChanges        => _en ? 'Save changes'              : 'Guardar cambios';
+  String get editName           => _en ? 'Edit name'                 : 'Editar nombre';
+  String get save               => _en ? 'Save'                      : 'Guardar';
+  String get nameUpdated        => _en ? 'Name updated'              : 'Nombre actualizado';
+  String get nameUpdateError    => _en ? 'Error saving name'         : 'Error al guardar el nombre';
+  String get activeRoutine      => _en ? 'Active routine'            : 'Rutina activa';
+  String get weight             => _en ? 'Weight'                    : 'Peso';
+  String get height             => _en ? 'Height'                    : 'Altura';
+  String get whereYouTrain      => _en ? 'Training location'         : 'Dónde entrenas';
+  String get actions            => _en ? 'Actions'                   : 'Acciones';
+  String memberSince(String date) => _en ? 'Member since $date'      : 'Miembro desde $date';
 
   // ── ChatBot ───────────────────────────────────────────────────────────────
   String get virtualTrainer     => _en ? 'Virtual trainer'           : 'Entrenador virtual';
@@ -199,6 +212,25 @@ class AppL10n {
   String get technologies       => _en ? 'Technologies'              : 'Tecnologías';
   String get architecture       => _en ? 'Architecture'              : 'Arquitectura';
   String get sourceCode         => _en ? 'Source code'               : 'Código fuente';
+
+  // ── Sugerencias rápidas del chatbot ──────────────────────────────────────
+  List<String> get quickSuggestions => _en
+      ? [
+          'What should I eat before training?',
+          'Give me motivation 💪',
+          'How long to rest between sets?',
+          'Tips to lose fat',
+          'What is creatine used for?',
+          'Abdominal exercises',
+        ]
+      : [
+          '¿Qué debo comer antes de entrenar?',
+          'Dame motivación 💪',
+          '¿Cuánto descanso entre series?',
+          'Consejos para perder grasa',
+          '¿Para qué sirve la creatina?',
+          'Ejercicio para abdominales',
+        ];
 
   // ── Frases motivadoras bilingues ──────────────────────────────────────────
   List<String> get motivationalPhrases => _en

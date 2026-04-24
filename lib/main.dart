@@ -49,7 +49,7 @@ class HorusApp extends StatelessWidget {
             ],
             supportedLocales: const [
               Locale('es', 'ES'),
-              Locale('en', 'US'),
+              Locale('en', 'GB'),
             ],
             locale: localeProvider.locale,
             routerConfig: AppRouter.router,

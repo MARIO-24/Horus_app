@@ -78,10 +78,10 @@ class OptionsScreen extends StatelessWidget {
                   selected: localeProvider.locale.languageCode == 'es',
                 ),
                 RadioListTile<Locale>(
-                  value: const Locale('en', 'US'),
+                  value: const Locale('en', 'GB'),
                   groupValue: localeProvider.locale,
                   title: Text(l10n.english),
-                  secondary: const Text('🇺🇸', style: TextStyle(fontSize: 20)),
+                  secondary: const Text('🇬🇧', style: TextStyle(fontSize: 20)),
                   onChanged: (v) {
                     if (v != null) localeProvider.setLocale(v);
                   },
@@ -361,6 +361,7 @@ class OptionsScreen extends StatelessWidget {
       ),
     );
   }
+} // end _OptionsScreenState
 
 /// Encabezado de sección
 class _SectionHeader extends StatelessWidget {

@@ -16,7 +16,7 @@ class LocaleProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final saved = prefs.getString(_localeKey);
     if (saved != null) {
-      _locale = saved == 'en' ? const Locale('en', 'US') : const Locale('es', 'ES');
+      _locale = saved == 'en' ? const Locale('en', 'GB') : const Locale('es', 'ES');
       notifyListeners();
     }
   }
