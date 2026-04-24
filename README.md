@@ -210,6 +210,8 @@ build/app/outputs/flutter-apk/app-release.apk
 
 | Hash | Tipo | Descripción |
 |------|------|-------------|
+| `3c6012a` | fix | Capturar providers antes del primer await en registro (widget unmounted) |
+| `9afa2b6` | security | Eliminar API key expuesta de Gemini, usar `String.fromEnvironment` + `.env` |
 | `e323364` | docs | README actualizado — bilingüe, distribución APK, DAM |
 | `b338bdb` | fix | Legibilidad modo claro/oscuro: iconos colores fijos, chips ejercicios, avatar chatbot opaco |
 | `e0aff07` | feat | Chatbot y rutinas bilingües EN/ES con Gemini, l10n pantalla cuenta y splash |
