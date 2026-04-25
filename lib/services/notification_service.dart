@@ -32,14 +32,15 @@ class NotificationService {
   }
 
   /// Solicita permiso de notificaciones (Android 13+).
-  /// Devuelve true si el permiso fue concedido.
+  /// Devuelve true si el permiso fue concedido o ya estaba concedido.
   static Future<bool> requestPermission() async {
     final androidPlugin =
         _plugin.resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>();
-    if (androidPlugin == null) return false;
+    if (androidPlugin == null) return true;
     final granted = await androidPlugin.requestNotificationsPermission();
-    return granted ?? false;
+    // null significa que el permiso ya estaba concedido (Android < 13)
+    return granted ?? true;
   }
 
   /// Comprueba si el permiso de notificaciones está concedido.

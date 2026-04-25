@@ -44,9 +44,12 @@ class NotificationProvider extends ChangeNotifier {
   /// Activa o desactiva la notificación diaria.
   Future<bool> setEnabled(bool value, {bool isEnglish = false}) async {
     if (value) {
-      // Solicitar permiso si no lo tiene
-      final granted = await NotificationService.requestPermission();
-      if (!granted) return false; // el usuario denegó el permiso
+      // Comprobar si ya tiene permiso antes de solicitarlo
+      final alreadyGranted = await NotificationService.hasPermission();
+      if (!alreadyGranted) {
+        final granted = await NotificationService.requestPermission();
+        if (!granted) return false; // el usuario denegó el permiso
+      }
       await NotificationService.scheduleDailyReminder(
         hour: _hour,
         minute: _minute,
