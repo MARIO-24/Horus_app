@@ -24,10 +24,10 @@
 
 | Módulo | Descripción |
 |--------|-------------|
-| 🔐 **Autenticación** | Registro e inicio de sesión con Firebase Auth (email/contraseña) |
+| 🔐 **Autenticación** | Registro e inicio de sesión con Firebase Auth (email/contraseña) + aceptación de Términos y Condiciones |
 | 👤 **Perfil de usuario** | Datos personales, foto de perfil con caché, edición de nombre |
-| 🤖 **Chatbot IA** | Entrenador virtual con Google Gemini + fallback local por palabras clave |
-| 🏋️ **Rutinas IA** | Generación personalizada de rutinas con Gemini, con descripciones por ejercicio |
+| 🤖 **Chatbot IA** | Coach profesional de élite con Google Gemini: responde sobre cualquier ejercicio, nutrición deportiva, suplementación y composición corporal. Fallback local por palabras clave |
+| 🏋️ **Rutinas IA** | Generación personalizada con Gemini: considera edad, peso, altura, IMC, nivel físico, objetivo y equipamiento disponible según ubicación |
 | 📊 **Historial de chat** | Conversaciones persistidas por usuario en Firestore |
 | 🌗 **Tema claro/oscuro** | Soporte completo de tema dinámico con Material 3 |
 | 🗑️ **Gestión de cuenta** | Eliminación de cuenta con borrado completo de datos (Firestore + Storage) |
@@ -62,19 +62,27 @@ lib/
 
 ## 🤖 Integración con IA
 
-### Chatbot — Horus
+### Chatbot — Horus (Coach de élite)
 - Motor principal: **Gemini 2.5 Flash Lite** via REST API
-- Historial de conversación: últimos 6 mensajes enviados a Gemini como contexto
-- Límite de tokens: 350 por respuesta (velocidad optimizada)
+- System prompt de coach profesional con conocimiento en: biomecánica, periodización, RPE/RIR, HIIT/LISS, macros/TDEE, suplementación basada en evidencia, composición corporal, recuperación y psicología del deporte
+- Responde sobre **cualquier ejercicio específico** (sentadilla, peso muerto, hip thrust, etc.) con técnica, músculos, errores comunes y progresiones
+- Historial de conversación: últimos 6 mensajes como contexto
+- Límite de tokens: 600 por respuesta, timeout 20s
 - Fallback automático: sistema local de palabras clave si la API no está disponible
 - Persistencia: historial guardado en Firestore por `uid` de usuario
 - **Bilingüe**: prompts del sistema y sugerencias rápidas en ES 🇪🇸 / EN 🇬🇧
 
-### Generador de rutinas
+### Generador de rutinas (IA avanzada)
 - Motor principal: **Gemini 2.5 Flash Lite** — genera JSON estructurado con ejercicios
+- **Perfil biométrico completo**: edad, peso, altura e **IMC calculado automáticamente** (bajo peso / normal / sobrepeso / obesidad)
+- **Equipamiento adaptado al lugar de entrenamiento**:
+  - 🏋️ **Gimnasio**: barras olímpicas, poleas, máquinas guiadas, rack de sentadillas
+  - 🏠 **Casa**: sillas/mesas para fondos y rows, garrafas como peso, objetos domésticos
+  - 🌳 **Aire libre con equipamiento**: mancuernas, comba, bandas elásticas
+  - 🌿 **Aire libre sin equipamiento**: calistenia pura, entorno urbano (bancos, escaleras)
 - Cada ejercicio incluye: nombre, series, repeticiones, descanso y **descripción de ejecución**
 - Fallback automático: banco de rutinas pre-diseñadas por objetivo y nivel
-- Parámetros: objetivo, nivel, días/semana, género, lugar de entrenamiento
+- Límite de tokens: 5000, timeout 45s
 - **Bilingüe**: rutinas generadas en el idioma seleccionado por el usuario
 
 ---
@@ -141,10 +149,17 @@ service cloud.firestore {
 ```
 
 ### 5. Configurar API Key de Gemini
-Sustituye la clave en `lib/services/chatbot_service.dart` y `lib/services/routine_generator_service.dart`:
-```dart
-static const _apiKey = 'TU_API_KEY_AQUI';
+Copia el archivo de ejemplo y añade tu clave:
+```bash
+cp lib/core/config/secrets.example.dart lib/core/config/secrets.dart
 ```
+Edita `lib/core/config/secrets.dart`:
+```dart
+class AppSecrets {
+  static const geminiApiKey = 'TU_API_KEY_AQUI';
+}
+```
+> ⚠️ `secrets.dart` está en `.gitignore` — nunca se sube al repositorio.  
 Obtén tu clave gratuita en [Google AI Studio](https://aistudio.google.com/app/apikey).
 
 ### 6. Ejecutar la app
@@ -210,6 +225,9 @@ build/app/outputs/flutter-apk/app-release.apk
 
 | Hash | Tipo | Descripción |
 |------|------|-------------|
+| `c9bf872` | feat | Mejorar IA de rutinas (IMC, biometría, equipamiento por ubicación) y chatbot (coach élite) |
+| `b71d169` | feat | Añadir aceptación de Términos y Condiciones en el registro |
+| `bda61da` | fix | Restaurar encoding UTF-8 y centralizar API key en `AppSecrets` (`secrets.dart`) |
 | `3c6012a` | fix | Capturar providers antes del primer await en registro (widget unmounted) |
 | `9afa2b6` | security | Eliminar API key expuesta de Gemini, usar `String.fromEnvironment` + `.env` |
 | `e323364` | docs | README actualizado — bilingüe, distribución APK, DAM |
