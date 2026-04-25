@@ -250,7 +250,8 @@ build/app/outputs/flutter-apk/app-release.apk
 
 ## �👨‍💻 Autor
 
-**Mario** — Trabajo de Fin de Grado  
+Rufito
+**Mario Sánchez Rufino** — Trabajo de Fin de Grado  
 Grado Superior en Desarrollo de Aplicaciones Multiplataforma (DAM)
 
 ---
@@ -259,6 +260,6 @@ Grado Superior en Desarrollo de Aplicaciones Multiplataforma (DAM)
 
 Este proyecto está bajo la licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Para obtener ayuda para comenzar con el desarrollo en Flutter, consulta la
+[documentacón online](https://docs.flutter.dev/), que ofrece tutoriales,
+ejemplos, orientación sobre desarrollo móvil y una referencia completa de la API.
