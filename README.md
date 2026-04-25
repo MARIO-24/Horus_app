@@ -32,6 +32,7 @@
 | 🌗 **Tema claro/oscuro** | Soporte completo de tema dinámico con Material 3 |
 | 🗑️ **Gestión de cuenta** | Eliminación de cuenta con borrado completo de datos (Firestore + Storage) |
 | 🌍 **Bilingüe ES / EN** | Toda la UI, prompts de IA y sugerencias del chatbot en español e inglés |
+| 🔔 **Notificaciones** | Recordatorio diario de entrenamiento configurable (hora personalizable) con toggle en Ajustes |
 
 ---
 
@@ -101,6 +102,9 @@ lib/
 | **GoRouter** | Navegación declarativa |
 | **CachedNetworkImage** | Caché de imágenes en disco |
 | **HTTP** | Llamadas REST a la API de Gemini |
+| **flutter_local_notifications** | Notificaciones locales programadas (alarma exacta diaria) |
+| **permission_handler** | Gestión de permisos en tiempo de ejecución (POST_NOTIFICATIONS) |
+| **timezone** | Programación de notificaciones con zona horaria local |
 
 ---
 
@@ -225,6 +229,8 @@ build/app/outputs/flutter-apk/app-release.apk
 
 | Hash | Tipo | Descripción |
 |------|------|-------------|
+| `05e07fb` | fix | `uiLocalNotificationDateInterpretation` + core library desugaring para `flutter_local_notifications` |
+| `5272125` | feat | Notificaciones diarias de recordatorio de entrenamiento con toggle y selector de hora en Ajustes |
 | `c9bf872` | feat | Mejorar IA de rutinas (IMC, biometría, equipamiento por ubicación) y chatbot (coach élite) |
 | `b71d169` | feat | Añadir aceptación de Términos y Condiciones en el registro |
 | `bda61da` | fix | Restaurar encoding UTF-8 y centralizar API key en `AppSecrets` (`secrets.dart`) |
