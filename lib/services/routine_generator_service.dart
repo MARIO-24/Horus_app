@@ -20,49 +20,107 @@ class RoutineGeneratorService {
     required String fitnessLevel,
     required int daysPerWeek,
     required String gender,
+    required int age,
+    required double weight,
+    required double height,
     String trainingLocation = 'Gimnasio',
     bool isEnglish = false,
   }) async {
+    // ── Calcular IMC ─────────────────────────────────────────────────────────
+    final double bmi = weight / ((height / 100) * (height / 100));
+    final String bmiCategory = isEnglish
+        ? (bmi < 18.5
+            ? 'Underweight (BMI ${bmi.toStringAsFixed(1)})'
+            : bmi < 25
+                ? 'Normal weight (BMI ${bmi.toStringAsFixed(1)})'
+                : bmi < 30
+                    ? 'Overweight (BMI ${bmi.toStringAsFixed(1)})'
+                    : 'Obesity (BMI ${bmi.toStringAsFixed(1)})')
+        : (bmi < 18.5
+            ? 'Bajo peso (IMC ${bmi.toStringAsFixed(1)})'
+            : bmi < 25
+                ? 'Peso normal (IMC ${bmi.toStringAsFixed(1)})'
+                : bmi < 30
+                    ? 'Sobrepeso (IMC ${bmi.toStringAsFixed(1)})'
+                    : 'Obesidad (IMC ${bmi.toStringAsFixed(1)})');
+
+    // ── Descripción del equipamiento por ubicación ────────────────────────
+    final String equipmentDescription = isEnglish
+        ? _equipmentDescriptionEn(trainingLocation)
+        : _equipmentDescriptionEs(trainingLocation);
+
     try {
       final prompt = isEnglish
-          ? 'Generate a personalised workout routine in JSON format.\n\n'
-              'User profile:\n'
-              '- Goal: $goal\n'
-              '- Level: $fitnessLevel\n'
-              '- Days per week: $daysPerWeek\n'
-              '- Gender: $gender\n'
-              '- Training location: $trainingLocation\n\n'
-              'Return ONLY a JSON array with exactly $daysPerWeek days. '
-              'Each day must follow this exact format:\n'
-              '[{"dayNumber":1,"dayName":"Day 1 — Name","focus":"Muscle group",'
-              '"exercises":[{"name":"Exercise","sets":3,"reps":"12","rest":"60s",'
-              '"notes":"Brief description of how to perform the exercise correctly"}]}]\n\n'
-              'The "notes" field is MANDATORY for each exercise: include a concise description '
-              '(1-2 sentences) on how to perform the exercise, which muscles it targets and a '
-              'key execution tip.\n'
-              'Each day must have between 4 and 7 exercises. Adapt to the level and location. '
-              'Respond ONLY with the JSON, no text or markdown blocks.'
-          : 'Genera una rutina de entrenamiento personalizada en formato JSON.\n\n'
-              'Perfil del usuario:\n'
-              '- Objetivo: $goal\n'
-              '- Nivel: $fitnessLevel\n'
-              '- Días por semana: $daysPerWeek\n'
-              '- Género: $gender\n'
-              '- Lugar de entrenamiento: $trainingLocation\n\n'
-              'Devuelve ÚNICAMENTE un array JSON con exactamente $daysPerWeek días. '
-              'Cada día debe tener este formato exacto:\n'
-              '[{"dayNumber":1,"dayName":"Día 1 — Nombre","focus":"Grupo muscular",'
-              '"exercises":[{"name":"Ejercicio","sets":3,"reps":"12","rest":"60s",'
-              '"notes":"Descripción breve de cómo ejecutar el ejercicio correctamente"}]}]\n\n'
-              'El campo "notes" es OBLIGATORIO en cada ejercicio: incluye una descripción '
-              'concisa (1-2 frases) sobre cómo realizar el ejercicio correctamente, '
-              'qué músculos trabaja y algún consejo clave de ejecución.\n'
-              'Cada día debe tener entre 4 y 7 ejercicios. Adapta al nivel y lugar. '
-              'Responde SOLO con el JSON, sin texto ni bloques markdown.';
+          ? '''Generate a personalised workout routine in JSON format.
+
+USER BIOMETRIC PROFILE:
+- Age: $age years
+- Weight: ${weight.toStringAsFixed(1)} kg
+- Height: ${height.toStringAsFixed(0)} cm
+- BMI: $bmiCategory
+- Gender: $gender
+
+TRAINING PARAMETERS:
+- Goal: $goal
+- Fitness level: $fitnessLevel
+- Training days per week: $daysPerWeek
+- Training location: $trainingLocation
+- Available equipment: $equipmentDescription
+
+INSTRUCTIONS:
+1. Adapt the exercise selection STRICTLY to the available equipment described above.
+2. Adjust intensity, volume and rest times to the fitness level and BMI.
+3. Structure the weekly plan to maximise progress towards the stated goal.
+4. Each day must have between 4 and 7 exercises.
+5. Return ONLY a JSON array with exactly $daysPerWeek elements.
+
+JSON format for each day:
+[{"dayNumber":1,"dayName":"Day 1 — Focus name","focus":"Primary muscle group",
+"exercises":[{"name":"Exercise name","sets":3,"reps":"12","rest":"60s",
+"notes":"How to perform it correctly, muscles worked and a key technique tip"}]}]
+
+The "notes" field is MANDATORY for every exercise.
+Respond ONLY with the valid JSON, no markdown, no extra text.'''
+          : '''Genera una rutina de entrenamiento personalizada en formato JSON.
+
+PERFIL BIOMÉTRICO DEL USUARIO:
+- Edad: $age años
+- Peso: ${weight.toStringAsFixed(1)} kg
+- Altura: ${height.toStringAsFixed(0)} cm
+- IMC: $bmiCategory
+- Género: $gender
+
+PARÁMETROS DE ENTRENAMIENTO:
+- Objetivo: $goal
+- Nivel físico: $fitnessLevel
+- Días de entrenamiento por semana: $daysPerWeek
+- Lugar de entrenamiento: $trainingLocation
+- Equipamiento disponible: $equipmentDescription
+
+INSTRUCCIONES:
+1. Adapta la selección de ejercicios ESTRICTAMENTE al equipamiento disponible descrito.
+2. Ajusta la intensidad, el volumen y los tiempos de descanso al nivel físico y al IMC.
+3. Estructura el plan semanal para maximizar el progreso hacia el objetivo indicado.
+4. Cada día debe tener entre 4 y 7 ejercicios.
+5. Devuelve ÚNICAMENTE un array JSON con exactamente $daysPerWeek elementos.
+
+Formato JSON para cada día:
+[{"dayNumber":1,"dayName":"Día 1 — Nombre del enfoque","focus":"Grupo muscular principal",
+"exercises":[{"name":"Nombre del ejercicio","sets":3,"reps":"12","rest":"60s",
+"notes":"Cómo ejecutarlo correctamente, músculos que trabaja y consejo clave de técnica"}]}]
+
+El campo "notes" es OBLIGATORIO en cada ejercicio.
+Responde SOLO con el JSON válido, sin markdown ni texto adicional.''';
 
       final systemInstruction = isEnglish
-          ? 'You are an expert personal trainer. You generate workout routines in valid JSON, without additional text.'
-          : 'Eres un entrenador personal experto. Generas rutinas de entrenamiento en JSON válido, sin texto adicional.';
+          ? 'You are an elite personal trainer and exercise scientist with 15+ years of experience. '
+              'You design evidence-based training programmes adapted to each user\'s biometrics, '
+              'fitness level, available equipment and specific goal. '
+              'You generate ONLY valid JSON arrays, with no additional text or markdown blocks.'
+          : 'Eres un entrenador personal de élite y científico del ejercicio con más de 15 años '
+              'de experiencia. Diseñas programas de entrenamiento basados en evidencia, adaptados '
+              'a la biometría, nivel físico, equipamiento disponible y objetivo específico de cada '
+              'usuario. Generas ÚNICAMENTE arrays JSON válidos, sin texto adicional ni bloques markdown.';
 
       final response = await http
           .post(
@@ -85,10 +143,10 @@ class RoutineGeneratorService {
                   ]
                 }
               ],
-              'generationConfig': {'maxOutputTokens': 4000},
+              'generationConfig': {'maxOutputTokens': 5000},
             }),
           )
-          .timeout(const Duration(seconds: 30));
+          .timeout(const Duration(seconds: 45));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -140,6 +198,60 @@ class RoutineGeneratorService {
         gender: gender,
         trainingLocation: trainingLocation,
       );
+    }
+  }
+
+  // ── Descripciones de equipamiento por ubicación ─────────────────────────
+  static String _equipmentDescriptionEs(String location) {
+    switch (location) {
+      case 'Gimnasio':
+        return 'Gimnasio completo: barras olímpicas, mancuernas, máquina de poleas, '
+            'jalón, press de piernas, banco plano/inclinado/declinado, rack de '
+            'sentadillas, cinta de correr, bicicleta estática, máquinas guiadas '
+            'de pecho, hombros, espalda y piernas.';
+      case 'Casa':
+        return 'Entrenamiento en casa sin equipamiento específico: '
+            'sillas y mesas (para fondos, step-ups y rows invertidos), '
+            'mochilas o garrafas de agua como peso adicional, espacio en el suelo '
+            'para ejercicios de suelo, paredes para handstands y piques isométricos. '
+            'Usa SOLO ejercicios con peso corporal o con estos objetos domésticos.';
+      case 'Aire libre con equipamiento':
+        return 'Entrenamiento en exterior con equipamiento básico: '
+            'juego de mancuernas ajustables, comba, bandas elásticas de resistencia, '
+            'esterilla, suficiente espacio para moverse. '
+            'Incluye ejercicios con mancuernas, trabajo de cardio con comba y '
+            'ejercicios con bandas.';
+      case 'Aire libre sin equipamiento':
+        return 'Entrenamiento en exterior sin ningún equipamiento: '
+            'solo el peso corporal y el entorno urbano (bancos de parque para fondos '
+            'o step-ups, barras de parque para dominadas si hay, suelo, escaleras). '
+            'Usa ÚNICAMENTE ejercicios de calistenia y peso corporal.';
+      default:
+        return location;
+    }
+  }
+
+  static String _equipmentDescriptionEn(String location) {
+    switch (location) {
+      case 'Gimnasio':
+        return 'Full gym: Olympic barbells, dumbbells, cable machines, lat pulldown, '
+            'leg press, flat/incline/decline bench, squat rack, treadmill, stationary '
+            'bike, guided machines for chest, shoulders, back and legs.';
+      case 'Casa':
+        return 'Home workout with no specific equipment: chairs and tables (for dips, '
+            'step-ups and inverted rows), backpacks or water jugs as added weight, '
+            'floor space for ground exercises, walls for handstand practice. '
+            'Use ONLY bodyweight exercises or these household objects.';
+      case 'Aire libre con equipamiento':
+        return 'Outdoor training with basic equipment: adjustable dumbbell set, '
+            'jump rope, resistance bands, mat, enough open space to move. '
+            'Include dumbbell exercises, jump rope cardio and band work.';
+      case 'Aire libre sin equipamiento':
+        return 'Outdoor training with no equipment: bodyweight only and urban environment '
+            '(park benches for dips or step-ups, pull-up bars if available, ground, stairs). '
+            'Use ONLY calisthenics and bodyweight exercises.';
+      default:
+        return location;
     }
   }
 

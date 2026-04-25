@@ -62,6 +62,14 @@ class RoutineProvider extends ChangeNotifier {
     _status = RoutineStatus.loading;
     notifyListeners();
     try {
+      // Calcular edad a partir de la fecha de nacimiento
+      final today = DateTime.now();
+      int age = today.year - birthDate.year;
+      if (today.month < birthDate.month ||
+          (today.month == birthDate.month && today.day < birthDate.day)) {
+        age--;
+      }
+
       // Generar los días de la rutina con Gemini (fallback local si falla)
       final days = await RoutineGeneratorService.generateRoutineWithAI(
         goal: goal,
@@ -69,6 +77,9 @@ class RoutineProvider extends ChangeNotifier {
         daysPerWeek: daysPerWeek,
         gender: gender,
         trainingLocation: trainingLocation,
+        age: age,
+        weight: weight,
+        height: height,
         isEnglish: isEnglish,
       );
 
