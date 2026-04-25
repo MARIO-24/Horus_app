@@ -225,7 +225,17 @@ build/app/outputs/flutter-apk/app-release.apk
 
 ---
 
-## � Historial de cambios (Changelog)
+## 📋 Historial de cambios (Changelog)
+
+### v1.1.0 — Correcciones y mejoras de UX
+
+| Tipo | Descripción |
+|------|-------------|
+| fix | **Notificaciones en release**: se usaba `exactAllowWhileIdle` que requiere un permiso especial del sistema en Android 12+ (`SCHEDULE_EXACT_ALARM`) y fallaba silenciosamente. Cambiado a `inexactAllowWhileIdle` (sin permisos adicionales); añadido `try-catch` en el provider para evitar cuelgues del toggle |
+| fix | **Teclado tapa pantalla en Login/Registro**: el teclado software ocultaba los campos del formulario. Cambiado a `resizeToAvoidBottomInset: false` + padding dinámico con `MediaQuery.viewInsetsOf(context).bottom` en el `SingleChildScrollView`; añadido `keyboardDismissBehavior: onDrag` para cerrar teclado al desplazar |
+| feat | **Persistencia de datos personales en formulario de rutina**: fecha de nacimiento, peso, altura y género se guardan en `SharedPreferences` al generar la rutina y se precargan automáticamente en la siguiente apertura del formulario |
+
+### v1.0.0 — Release inicial
 
 | Hash | Tipo | Descripción |
 |------|------|-------------|

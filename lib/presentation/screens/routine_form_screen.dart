@@ -9,6 +9,7 @@ import 'package:horus_app/presentation/widgets/custom_text_field.dart';
 import 'package:horus_app/routes/app_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Formulario para recoger los datos del usuario y generar una rutina personalizada
 class RoutineFormScreen extends StatefulWidget {
@@ -29,6 +30,44 @@ class _RoutineFormScreenState extends State<RoutineFormScreen> {
   String _goal = AppConstants.goalOptions[0];
   String _trainingLocation = AppConstants.trainingLocationOptions[0];
   int _daysPerWeek = 3;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPersonalData();
+  }
+
+  Future<void> _loadPersonalData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final weight = prefs.getString('routine_weight');
+    final height = prefs.getString('routine_height');
+    final birthDateMs = prefs.getInt('routine_birth_date');
+    final gender = prefs.getString('routine_gender');
+
+    if (!mounted) return;
+    setState(() {
+      if (weight != null) _weightCtrl.text = weight;
+      if (height != null) _heightCtrl.text = height;
+      if (birthDateMs != null) {
+        _birthDate = DateTime.fromMillisecondsSinceEpoch(birthDateMs);
+      }
+      if (gender != null &&
+          AppConstants.genderOptions.contains(gender)) {
+        _gender = gender;
+      }
+    });
+  }
+
+  Future<void> _savePersonalData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('routine_weight', _weightCtrl.text);
+    await prefs.setString('routine_height', _heightCtrl.text);
+    if (_birthDate != null) {
+      await prefs.setInt(
+          'routine_birth_date', _birthDate!.millisecondsSinceEpoch);
+    }
+    await prefs.setString('routine_gender', _gender);
+  }
 
   @override
   void dispose() {
@@ -88,6 +127,8 @@ class _RoutineFormScreenState extends State<RoutineFormScreen> {
     if (!mounted) return;
 
     if (routineProvider.status == RoutineStatus.loaded) {
+      await _savePersonalData();
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.routineSuccess),

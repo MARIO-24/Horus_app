@@ -126,6 +126,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final l10n = AppL10n.of(context);
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -137,7 +138,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: EdgeInsets.fromLTRB(24, 24, 24,
+                MediaQuery.viewInsetsOf(context).bottom + 24),
             child: Column(
               children: [
                 // ── Botón atrás + título ─────────────────────────────

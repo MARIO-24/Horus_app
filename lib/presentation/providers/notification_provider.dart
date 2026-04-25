@@ -50,11 +50,16 @@ class NotificationProvider extends ChangeNotifier {
         final granted = await NotificationService.requestPermission();
         if (!granted) return false; // el usuario denegó el permiso
       }
-      await NotificationService.scheduleDailyReminder(
-        hour: _hour,
-        minute: _minute,
-        isEnglish: isEnglish,
-      );
+      try {
+        await NotificationService.scheduleDailyReminder(
+          hour: _hour,
+          minute: _minute,
+          isEnglish: isEnglish,
+        );
+      } catch (e) {
+        debugPrint('[NotificationProvider] Error al programar notificación: $e');
+        return false;
+      }
     } else {
       await NotificationService.cancelDailyReminder();
     }
