@@ -8,6 +8,7 @@ import 'package:horus_app/presentation/providers/notification_provider.dart';
 import 'package:horus_app/presentation/providers/routine_provider.dart';
 import 'package:horus_app/presentation/providers/theme_provider.dart';
 import 'package:horus_app/presentation/providers/user_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:horus_app/presentation/widgets/custom_drawer.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -155,7 +156,7 @@ class OptionsScreen extends StatelessWidget {
           Card(
             child: Column(
               children: [
-                _InfoTile(title: l10n.appNameLabel, value: 'HorusAPP v1.1.1'),
+                _InfoTile(title: l10n.appNameLabel, value: 'HorusAPP v1.1.2'),
                 const Divider(height: 1, indent: 16),
                 _InfoTile(title: l10n.developer, value: 'Rufito'),
                 const Divider(height: 1, indent: 16),
@@ -445,9 +446,24 @@ class _NotificationsCard extends StatelessWidget {
             value: notifProvider.enabled,
             activeColor: Theme.of(context).colorScheme.primary,
             onChanged: (v) async {
-              final granted =
+              final result =
                   await notifProvider.setEnabled(v, isEnglish: isEnglish);
-              if (!granted && context.mounted) {
+              if (!context.mounted) return;
+              if (result == null) {
+                // Permiso denegado permanentemente → abrir ajustes del sistema
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(l10n.notifPermissionDenied),
+                    backgroundColor: Colors.red.shade600,
+                    behavior: SnackBarBehavior.floating,
+                    action: SnackBarAction(
+                      label: isEnglish ? 'Settings' : 'Ajustes',
+                      textColor: Colors.white,
+                      onPressed: () => openAppSettings(),
+                    ),
+                  ),
+                );
+              } else if (result == false) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(l10n.notifPermissionDenied),

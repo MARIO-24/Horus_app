@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -34,23 +35,21 @@ class NotificationService {
   /// Solicita permiso de notificaciones (Android 13+).
   /// Devuelve true si el permiso fue concedido o ya estaba concedido.
   static Future<bool> requestPermission() async {
-    final androidPlugin =
-        _plugin.resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
-    if (androidPlugin == null) return true;
-    final granted = await androidPlugin.requestNotificationsPermission();
-    // null significa que el permiso ya estaba concedido (Android < 13)
-    return granted ?? true;
+    final status = await Permission.notification.request();
+    return status.isGranted;
   }
 
   /// Comprueba si el permiso de notificaciones está concedido.
   static Future<bool> hasPermission() async {
-    final androidPlugin =
-        _plugin.resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
-    if (androidPlugin == null) return false;
-    final granted = await androidPlugin.areNotificationsEnabled();
-    return granted ?? false;
+    final status = await Permission.notification.status;
+    return status.isGranted;
+  }
+
+  /// Devuelve true si el permiso fue denegado permanentemente
+  /// (el usuario marcó "No volver a preguntar").
+  static Future<bool> isPermanentlyDenied() async {
+    final status = await Permission.notification.status;
+    return status.isPermanentlyDenied;
   }
 
   /// Programa una notificación diaria a la hora indicada [hour]:[minute].
