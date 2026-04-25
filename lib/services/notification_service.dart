@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -19,11 +20,15 @@ class NotificationService {
   /// Inicializa el plugin. Llamar una sola vez al arrancar la app.
   static Future<void> init() async {
     tz.initializeTimeZones();
+    // Fijar la zona horaria local real del dispositivo
+    final String localTz = await FlutterTimezone.getLocalTimezone();
+    tz.setLocalLocation(tz.getLocation(localTz));
 
     const androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
     const initSettings = InitializationSettings(android: androidSettings);
     await _plugin.initialize(initSettings);
+    debugPrint('[NotificationService] Zona horaria: $localTz');
   }
 
   /// Solicita permiso de notificaciones (Android 13+).
