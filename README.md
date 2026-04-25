@@ -227,12 +227,20 @@ build/app/outputs/flutter-apk/app-release.apk
 
 ## 📋 Historial de cambios (Changelog)
 
+### v1.1.1 — Mejora de UX en teclado (Login / Registro)
+
+| Tipo | Descripción |
+|------|-------------|
+| fix | **Logo animado en Login**: el logo de 200×200 px desaparece con animación suave (200 ms) al abrir el teclado, liberando espacio para que la tarjeta de login ocupe la pantalla completa. Al cerrar el teclado el logo reaparece |
+| fix | **Cabecera animada en Registro**: el título y el botón "atrás" se colapsan de igual forma cuando el teclado está visible, dejando la tarjeta de registro centrada |
+| fix | **Scroll libre con teclado abierto**: se elimina `keyboardDismissBehavior: onDrag` para que el usuario pueda desplazar la pantalla hacia arriba y hacia abajo mientras el teclado permanece abierto |
+
 ### v1.1.0 — Correcciones y mejoras de UX
 
 | Tipo | Descripción |
 |------|-------------|
 | fix | **Notificaciones en release**: se usaba `exactAllowWhileIdle` que requiere un permiso especial del sistema en Android 12+ (`SCHEDULE_EXACT_ALARM`) y fallaba silenciosamente. Cambiado a `inexactAllowWhileIdle` (sin permisos adicionales); añadido `try-catch` en el provider para evitar cuelgues del toggle |
-| fix | **Teclado tapa pantalla en Login/Registro**: el teclado software ocultaba los campos del formulario. Cambiado a `resizeToAvoidBottomInset: false` + padding dinámico con `MediaQuery.viewInsetsOf(context).bottom` en el `SingleChildScrollView`; añadido `keyboardDismissBehavior: onDrag` para cerrar teclado al desplazar |
+| fix | **Teclado tapa pantalla en Login/Registro**: el teclado software ocultaba los campos del formulario; añadido `SingleChildScrollView` con `resizeToAvoidBottomInset: true` (defecto) para que el Scaffold se redimensione correctamente |
 | feat | **Persistencia de datos personales en formulario de rutina**: fecha de nacimiento, peso, altura y género se guardan en `SharedPreferences` al generar la rutina y se precargan automáticamente en la siguiente apertura del formulario |
 
 ### v1.0.0 — Release inicial

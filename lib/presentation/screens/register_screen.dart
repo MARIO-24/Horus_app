@@ -124,9 +124,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     final isLoading = context.watch<AuthProvider>().isLoading;
     final l10n = AppL10n.of(context);
+    final keyboardVisible = MediaQuery.viewInsetsOf(context).bottom > 0;
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -138,34 +138,41 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         child: SafeArea(
           child: SingleChildScrollView(
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            padding: EdgeInsets.fromLTRB(24, 24, 24,
-                MediaQuery.viewInsetsOf(context).bottom + 24),
+            padding: const EdgeInsets.all(24),
             child: Column(
               children: [
-                // ── Botón atrás + título ─────────────────────────────
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back_ios,
-                          color: Colors.white),
-                      onPressed: () => context.go(AppRoutes.login),
-                    ),
-                    Expanded(
-                      child: Text(
-                        l10n.registerTitle,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
+                // ── Botón atrás + título (se oculta con el teclado) ──
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  height: keyboardVisible ? 0 : null,
+                  clipBehavior: Clip.hardEdge,
+                  decoration: const BoxDecoration(),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back_ios,
+                            color: Colors.white),
+                        onPressed: () => context.go(AppRoutes.login),
                       ),
-                    ),
-                    const SizedBox(width: 48),
-                  ],
+                      Expanded(
+                        child: Text(
+                          l10n.registerTitle,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(width: 48),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 24),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  height: keyboardVisible ? 8 : 24,
+                ),
 
                 // ── Formulario de registro ───────────────────────────
                 Card(

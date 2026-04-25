@@ -173,11 +173,9 @@ class _LoginScreenState extends State<LoginScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     final isLoading = context.watch<AuthProvider>().isLoading;
     final l10n = AppL10n.of(context);
-
-    final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+    final keyboardVisible = MediaQuery.viewInsetsOf(context).bottom > 0;
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -192,19 +190,29 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         child: SafeArea(
           child: SingleChildScrollView(
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            padding: EdgeInsets.fromLTRB(24, 24, 24, keyboardInset + 24),
+            padding: const EdgeInsets.all(24),
             child: Column(
               children: [
-                const SizedBox(height: 40),
-
-                // ── Logo ────────────────────────────────────────
-                Image.asset(
-                  'iconos/Logo_HorusApp.png',
-                  width: 200,
-                  height: 200,
+                // ── Logo (se oculta con el teclado) ────────────────
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  height: keyboardVisible ? 0 : 40,
                 ),
-                const SizedBox(height: 48),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  height: keyboardVisible ? 0 : 200,
+                  child: keyboardVisible
+                      ? const SizedBox.shrink()
+                      : Image.asset(
+                          'iconos/Logo_HorusApp.png',
+                          width: 200,
+                          height: 200,
+                        ),
+                ),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  height: keyboardVisible ? 16 : 48,
+                ),
 
                 // ── Formulario ───────────────────────────────────────
                 Card(
