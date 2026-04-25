@@ -4,6 +4,7 @@ import 'package:horus_app/core/l10n/app_l10n.dart';
 import 'package:horus_app/presentation/providers/auth_provider.dart';
 import 'package:horus_app/presentation/providers/chatbot_provider.dart';
 import 'package:horus_app/presentation/providers/locale_provider.dart';
+import 'package:horus_app/presentation/providers/notification_provider.dart';
 import 'package:horus_app/presentation/providers/routine_provider.dart';
 import 'package:horus_app/presentation/providers/theme_provider.dart';
 import 'package:horus_app/presentation/providers/user_provider.dart';
@@ -91,6 +92,11 @@ class OptionsScreen extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(height: 24),
+
+          // ── Notificaciones ─────────────────────────────────────────────
+          _SectionHeader(title: l10n.notificationsSection, icon: Icons.notifications_outlined),
+          _NotificationsCard(l10n: l10n),
           const SizedBox(height: 24),
 
           // ── Rutina ─────────────────────────────────────────────────────
@@ -409,6 +415,79 @@ class _InfoTile extends StatelessWidget {
           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
           fontSize: 13,
         ),
+      ),
+    );
+  }
+}
+
+// ── Tarjeta de notificaciones ────────────────────────────────────────────────
+class _NotificationsCard extends StatelessWidget {
+  final AppL10n l10n;
+  const _NotificationsCard({required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    final notifProvider = context.watch<NotificationProvider>();
+    final isEnglish = AppL10n.of(context).isEnglish;
+
+    return Card(
+      child: Column(
+        children: [
+          SwitchListTile(
+            secondary: Icon(
+              notifProvider.enabled
+                  ? Icons.notifications_active
+                  : Icons.notifications_off_outlined,
+              color: notifProvider.enabled ? Colors.orange : null,
+            ),
+            title: Text(l10n.dailyReminder),
+            subtitle: Text(l10n.dailyReminderSubtitle),
+            value: notifProvider.enabled,
+            activeColor: Theme.of(context).colorScheme.primary,
+            onChanged: (v) async {
+              final granted =
+                  await notifProvider.setEnabled(v, isEnglish: isEnglish);
+              if (!granted && context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(l10n.notifPermissionDenied),
+                    backgroundColor: Colors.red.shade600,
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
+            },
+          ),
+          if (notifProvider.enabled) ...[
+            const Divider(height: 1, indent: 16),
+            ListTile(
+              leading: const Icon(Icons.access_time, color: Colors.orange),
+              title: Text(l10n.reminderTime),
+              trailing: Text(
+                '${notifProvider.hour.toString().padLeft(2, '0')}:'
+                '${notifProvider.minute.toString().padLeft(2, '0')}',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: 16,
+                ),
+              ),
+              onTap: () async {
+                final picked = await showTimePicker(
+                  context: context,
+                  initialTime: notifProvider.timeOfDay,
+                );
+                if (picked != null && context.mounted) {
+                  await notifProvider.setTime(
+                    picked.hour,
+                    picked.minute,
+                    isEnglish: isEnglish,
+                  );
+                }
+              },
+            ),
+          ],
+        ],
       ),
     );
   }

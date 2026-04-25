@@ -261,6 +261,17 @@ Gracias por confiar en HorusAPP. Entrena inteligente, entrena seguro.''';
   String get architecture       => _en ? 'Architecture'              : 'Arquitectura';
   String get sourceCode         => _en ? 'Source code'               : 'Código fuente';
 
+  // ── Notificaciones ────────────────────────────────────────────────────────
+  String get notificationsSection    => _en ? 'Notifications'              : 'Notificaciones';
+  String get dailyReminder           => _en ? 'Daily training reminder'    : 'Recordatorio diario de entrenamiento';
+  String get dailyReminderSubtitle   => _en
+      ? 'Horus will remind you to train every day'
+      : 'Horus te recordará que debes entrenar cada día';
+  String get reminderTime            => _en ? 'Reminder time'              : 'Hora del recordatorio';
+  String get notifPermissionDenied   => _en
+      ? 'Notification permission denied. Enable it in system settings.'
+      : 'Permiso de notificación denegado. Actívalo en los ajustes del sistema.';
+
   // ── Sugerencias rápidas del chatbot ──────────────────────────────────────
   List<String> get quickSuggestions => _en
       ? [

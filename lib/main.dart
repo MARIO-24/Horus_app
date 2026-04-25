@@ -6,10 +6,12 @@ import 'package:horus_app/firebase_options.dart';
 import 'package:horus_app/presentation/providers/auth_provider.dart';
 import 'package:horus_app/presentation/providers/chatbot_provider.dart';
 import 'package:horus_app/presentation/providers/locale_provider.dart';
+import 'package:horus_app/presentation/providers/notification_provider.dart';
 import 'package:horus_app/presentation/providers/routine_provider.dart';
 import 'package:horus_app/presentation/providers/theme_provider.dart';
 import 'package:horus_app/presentation/providers/user_provider.dart';
 import 'package:horus_app/routes/app_router.dart';
+import 'package:horus_app/services/notification_service.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -17,6 +19,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await NotificationService.init();
   runApp(const HorusApp());
 }
 
@@ -33,9 +36,16 @@ class HorusApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => RoutineProvider()),
         ChangeNotifierProvider(create: (_) => ChatbotProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
       ],
       child: Consumer2<ThemeProvider, LocaleProvider>(
         builder: (context, themeProvider, localeProvider, _) {
+          // Cargar preferencias de notificación al iniciar
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            context.read<NotificationProvider>().load(
+                  isEnglish: localeProvider.locale.languageCode == 'en',
+                );
+          });
           return MaterialApp.router(
             title: 'HorusAPP',
             debugShowCheckedModeBanner: false,
