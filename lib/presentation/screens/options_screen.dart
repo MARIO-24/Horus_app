@@ -334,11 +334,13 @@ class OptionsScreen extends StatelessWidget {
 
                   await context.read<UserProvider>().deleteFullAccount(uid);
                   await context.read<RoutineProvider>().deleteRoutine(uid);
+                  await context.read<ChatbotProvider>().deleteChat(uid);
                   await firebaseUser.delete();
 
                   if (context.mounted) {
                     context.read<AuthProvider>().logout();
                     context.read<RoutineProvider>().clear();
+                    context.read<UserProvider>().clear();
                     context.read<ChatbotProvider>().clear();
                   }
                 } on FirebaseAuthException catch (e) {

@@ -148,11 +148,13 @@ class _AccountScreenState extends State<AccountScreen> {
           FilledButton(
             onPressed: () async {
               Navigator.pop(context);
+              final routineProvider = context.read<RoutineProvider>();
+              final userProvider = context.read<UserProvider>();
+              final chatProvider = context.read<ChatbotProvider>();
               await context.read<AuthProvider>().logout();
-              if (!mounted) return;
-              context.read<RoutineProvider>().clear();
-              context.read<UserProvider>().clear();
-              context.read<ChatbotProvider>().clear();
+              routineProvider.clear();
+              userProvider.clear();
+              chatProvider.clear();
             },
             child: Text(l10n.logoutConfirm),
           ),
