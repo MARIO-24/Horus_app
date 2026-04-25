@@ -95,6 +95,8 @@ class NotificationService {
       scheduled,
       details,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: DateTimeComponents.time, // repite diariamente
     );
     debugPrint('[NotificationService] Notificación diaria programada a las $hour:${minute.toString().padLeft(2, '0')}');
