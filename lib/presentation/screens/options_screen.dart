@@ -156,7 +156,7 @@ class OptionsScreen extends StatelessWidget {
           Card(
             child: Column(
               children: [
-                _InfoTile(title: l10n.appNameLabel, value: 'HorusAPP v1.1.2'),
+                _InfoTile(title: l10n.appNameLabel, value: 'HorusAPP v1.1.3'),
                 const Divider(height: 1, indent: 16),
                 _InfoTile(title: l10n.developer, value: 'Rufito'),
                 const Divider(height: 1, indent: 16),
