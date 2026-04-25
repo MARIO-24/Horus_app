@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:horus_app/core/constants/app_constants.dart';
 import 'package:horus_app/core/l10n/app_l10n.dart';
 import 'package:horus_app/presentation/providers/auth_provider.dart';
 import 'package:horus_app/presentation/providers/chatbot_provider.dart';
@@ -260,6 +261,21 @@ class _AccountScreenState extends State<AccountScreen> {
     );
   }
 
+  // ── Helpers ──────────────────────────────────────────────────────────────
+
+  /// Translates a stored (Spanish) option value to the current locale label.
+  String _localizeOption(
+    String storedValue,
+    List<String> sourceOptions,
+    List<String> localizedOptions,
+  ) {
+    final idx = sourceOptions.indexOf(storedValue);
+    if (idx >= 0 && idx < localizedOptions.length) {
+      return localizedOptions[idx];
+    }
+    return storedValue;
+  }
+
   // ── Build ────────────────────────────────────────────────────────────────
 
   @override
@@ -416,13 +432,25 @@ class _AccountScreenState extends State<AccountScreen> {
                       const Divider(height: 24),
                       _InfoRow(
                           label: l10n.goalLabel,
-                          value: routineProvider.routine!.goal),
+                          value: _localizeOption(
+                            routineProvider.routine!.goal,
+                            AppConstants.goalOptions,
+                            l10n.goalOptions,
+                          )),
                       _InfoRow(
                           label: l10n.levelLabel,
-                          value: routineProvider.routine!.fitnessLevel),
+                          value: _localizeOption(
+                            routineProvider.routine!.fitnessLevel,
+                            AppConstants.fitnessLevelOptions,
+                            l10n.fitnessOptions,
+                          )),
                       _InfoRow(
                           label: l10n.whereYouTrain,
-                          value: routineProvider.routine!.trainingLocation),
+                          value: _localizeOption(
+                            routineProvider.routine!.trainingLocation,
+                            AppConstants.trainingLocationOptions,
+                            l10n.locationOptions,
+                          )),
                       _InfoRow(
                           label: l10n.daysWeekLabel,
                           value:
