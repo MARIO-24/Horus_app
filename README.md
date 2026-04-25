@@ -250,8 +250,7 @@ build/app/outputs/flutter-apk/app-release.apk
 
 ## �👨‍💻 Autor
 
-Rufito
-**Mario Sánchez Rufino** — Trabajo de Fin de Grado  
+Rufito -- **Mario Sánchez Rufino** — Trabajo de Fin de Grado  
 Grado Superior en Desarrollo de Aplicaciones Multiplataforma (DAM)
 
 ---
